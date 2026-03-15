@@ -32,13 +32,11 @@
         html { scroll-behavior: smooth; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            20%, 60% { transform: translateX(-5px); }
-            40%, 80% { transform: translateX(5px); }
-        }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-5px); } 40%, 80% { transform: translateX(5px); } }
         .animate-shake { animation: shake 0.4s ease-in-out; }
+        /* Happening Now Pulse */
+        @keyframes pulse-border { 0% { border-color: #e7e5e4; } 50% { border-color: #1c1917; } 100% { border-color: #e7e5e4; } }
+        .happening-now { animation: pulse-border 2s infinite; border-width: 2px; }
     </style>
 </head>
 <body>
@@ -51,31 +49,23 @@
         // 🛠️ MASTER CONFIGURATION (EDIT FOR EACH WEDDING)
         // ============================================================================
         const CONFIG = {
-            // General Info
             coupleNames: "Bride & Groom",
             weddingDate: "2026-08-28T00:00:00", // YYYY-MM-DD
             displayDate: "August 28, 2026",
             weddingLocation: "Sydney, Australia",
-            
-            // Security
             pinCode: "2808",
-            
-            // Features
+            theme: "classic", 
             enableMapScreen: false, 
             mapImageURL: "https://via.placeholder.com/800x1200?text=Map+Placeholder",
-            
-            // Footer
             footerMessage: "We can't wait to celebrate with you!",
             footerSignoff: "Best wishes • The Bride & Groom",
 
-            // Info Hub Links
             helpfulLinks: [
                 { title: "Venue Directions", url: "#" },
                 { title: "Accommodation Blocks", url: "#" },
                 { title: "Digital Guestbook", url: "#" }
             ],
 
-            // Custom Filters
             filters: [
                 { id: 'all', label: 'Everyone' },
                 { id: 'bride', label: 'Bride' },
@@ -85,22 +75,17 @@
                 { id: 'family', label: 'Family' }
             ],
 
-            // Roles Checklists (Triggered by pressing a filter 3 times)
             checklists: {
                 bride: {
-                    theme: 'neutral', // Clean white elegant theme
-                    title: 'The Bride',
-                    // On the day:
+                    theme: 'ivory', title: 'The Bride',
+                    items: ['Wedding Dress & Veil', 'Shoes & Backup Flats', 'Jewelry & Perfume', 'Vows Printed', 'Rings', 'Touch-up Makeup', 'Emergency Kit'],
                     messageLines: [
                         'Take a deep breath.',
                         'Today is going to be the best day of your life.',
                         'Be present in every moment. Soak it all in. Look at the people who love you.',
                         'Don\'t sweat the small stuff, everything is exactly as it should be.'
                     ],
-                    messageSignoff: 'Enjoy every second',
-                    // Before the day:
-                    items: ['Wedding Dress & Veil', 'Shoes & Backup Flats', 'Jewelry & Perfume', 'Vows Printed', 'Rings', 'Touch-up Makeup', 'Emergency Kit'],
-                    footer: "You're going to look beautiful"
+                    signoff: "You're going to look beautiful"
                 },
                 groom: {
                     theme: 'dark', title: 'The Groom',
@@ -113,183 +98,113 @@
                     footer: "Keep the vibes high"
                 },
                 groomsmen: {
-                    theme: 'dark', title: 'Groomsmen',
+                    theme: 'charcoal', title: 'Groomsmen',
                     items: ['Suits On & Lint Rolled', 'Boutonnières Pinned', 'Rings Secured (Best Man)', 'Transport Checked', 'Hype the Groom'],
                     footer: "Keep the vibes high"
                 }
             }
         };
 
-        // Vendor Directory
         const vendors = [
             { role: 'Venue Coordinator', name: 'Sarah Mitchell', contact: '0412 345 678', email: 'hello@beautifulvenue.com.au' },
             { role: 'Hair & Makeup Artist', name: 'Glamour & Co.', contact: '0400 111 222', email: 'bookings@glamourco.com' },
             { role: 'DJ / Photobooth', name: 'Rhythm Entertainment', contact: '0499 888 777', email: 'info@rhythment.com.au' },
             { role: 'Stylist / Florist', name: 'Petal & Fern', contact: 'TBA', email: 'design@petalfern.com' },
-            { role: 'Photographer', name: 'Captured Moments', contact: '0433 444 555', email: 'shoot@captured.com' },
-            { role: 'Videographer', name: 'Cinematic Love', contact: '0455 666 777', email: '' },
-            { role: 'Transport', name: 'Sydney Shuttles', contact: '1300 000 111', email: '' },
-            { role: 'Celebrant', name: 'Hitched by Alex', contact: '0488 999 000', email: 'alex@hitched.com.au' }
+            { role: 'Photographer', name: 'Captured Moments', contact: '0433 444 555', email: 'shoot@captured.com' }
         ];
 
-        // The Full Timeline (Rich Demo Content)
+        const bridalParty = [
+            { role: 'Maid of Honor', name: 'Jessica', contact: '0411 222 333' },
+            { role: 'Best Man', name: 'Bryan', contact: '0422 333 444' },
+            { role: 'Mother of Bride', name: 'Linda', contact: '0455 666 777' }
+        ];
+
         const events = [
             {
                 id: 1, time: '6:30 AM', title: 'Wake Up & Get Ready!', location: 'Hotel Suites, CBD', responsible: ['Bride', 'Groom'], teams: ['all'],
                 description: [
                     { type: 'paragraph', text: 'Rise and shine! Order room service and get the day started. Remember to stay hydrated and eat a good breakfast.' },
                     { type: 'checklist', items: ['Order Room Service', 'Brush Teeth', 'Layout outfits for photographer'] }
-                ],
-                links: [{ text: "Spotify Morning Playlist", url: "#" }]
+                ], links: [{ text: "Spotify Morning Playlist", url: "#" }]
             },
             {
                 id: 2, time: '7:00 AM', title: 'Hair and Make Up Start', location: 'Bridal Suite, Room 402', responsible: ['Bride'], teams: ['bridesmaids'],
                 description: [
                     { type: 'paragraph', text: 'Glamour & Co. arrives. Please ensure all bridesmaids have clean, dry hair and moisturised faces!' },
-                    { type: 'list', items: [
-                        '7:00am: Bridesmaid 1 (Sarah) - Hair',
-                        '7:00am: Maid of Honor (Jess) - Makeup',
-                        '7:30am: Bridesmaid 2 (Emily) - Hair',
-                        '7:45am: Bridesmaid 1 (Sarah) - Makeup'
-                    ]}
+                    { type: 'list', items: ['7:00am: Bridesmaid 1 (Sarah) - Hair', '7:00am: Maid of Honor (Jess) - Makeup', '7:30am: Bridesmaid 2 (Emily) - Hair'] }
                 ], links: []
             },
             {
                 id: 3, time: '9:00 AM', title: 'Groomsmen Breakfast & Prep', location: 'Groom Suite, Room 310', responsible: ['Best Man'], teams: ['groomsmen'],
                 description: [
-                    { type: 'paragraph', text: 'Groomsmen to gather in the Groom\'s suite. Breakfast arrives at 9:00 AM.' },
-                    { type: 'paragraph', text: 'Best Man to ensure everyone\'s suits are steamed and lint-rolled before the photographer arrives.' }
+                    { type: 'paragraph', text: 'Groomsmen to gather in the Groom\'s suite. Breakfast arrives at 9:00 AM.' }
                 ], links: []
             },
             {
-                id: 4, time: '9:30 AM', title: 'Groomsmen Packing', location: 'Groom Suite, Room 310', responsible: ['Best Man'], teams: ['groomsmen'],
-                description: [
-                    { type: 'paragraph', text: 'The shuttle waits for no one! Have all your items packed by the door.' },
-                    { type: 'checklist', items: ['Suit & Tie on properly', 'Overnight bags packed for Venue', 'Rings secured (Best Man)', 'Vows printed'] },
-                ], links: []
+                id: 4, time: '11:00 AM', title: 'Everyone is dressed!', location: 'Hotel Suites, CBD', responsible: ['Bride', 'Groom'], teams: ['all'],
+                description: [{ type: 'list', items: ['Bridesmaids are fully dressed in their gowns', 'Groomsmen are fully suited with boutonnières pinned'] }], links: []
             },
             {
-                id: 5, time: '11:00 AM', title: 'Everyone is dressed!', location: 'Hotel Suites, CBD', responsible: ['Bride', 'Groom'], teams: ['all'],
-                description: [
-                    { type: 'list', items: [
-                        'Bridesmaids are fully dressed in their gowns',
-                        'Groomsmen are fully suited with boutonnières pinned',
-                        'Parents are dressed and ready in the lobby',
-                        'Bride to step into her dress (Maid of Honor helping)'
-                    ]}
-                ], links: []
-            },
-            {
-                id: 6, time: '11:30 AM', title: 'Photography Arrives', location: 'Bridal Suite, Room 402', responsible: ['Maid of Honor'], teams: ['all', 'family'],
-                description: [
-                    { type: 'paragraph', text: 'Lead Photographer and Videographer arrive for detail shots and "getting ready" moments.' },
-                    { type: 'list', items: ['11:30am: Dress and ring details', '12:00pm: Bridal party champagne toast', '12:30pm: First look with Father of the Bride'] }
-                ], links: []
-            },
-            {
-                id: 7, time: '1:30 PM', title: 'Transport to Venue', location: 'Hotel Lobby', responsible: ['Best Man'], teams: ['all'],
+                id: 5, time: '1:30 PM', title: 'Transport to Venue', location: 'Hotel Lobby', responsible: ['Best Man'], teams: ['all'],
                 description: [
                     { type: 'paragraph', text: 'Sydney Shuttles arrives at 1:30pm sharp. We depart at 1:45pm. Ensure all items needed are packed. We cannot turn back!' },
                     { type: 'checklist', items: ['Rings', 'Vows', 'Reception Outfit Changes', 'Emergency Kit', 'Phone Chargers'] }
                 ], links: []
             },
             {
-                id: 8, time: '2:30 PM', title: 'Arrival at Venue & Rehearsal', location: 'Beautiful Venue, Gardens', responsible: ['Bride', 'Groom'], teams: ['bride', 'groom', 'bridesmaids', 'groomsmen'],
+                id: 6, time: '4:00 PM', title: 'First Look & Guests Arrive', location: 'Venue Grounds', responsible: ['Bride', 'Groom'], teams: ['bride', 'groom'],
                 description: [
-                    { type: 'paragraph', text: 'Bridal party arrives and hides away in the green room. Quick run-through of the ceremony walking order with the Venue Coordinator.' }
+                    { type: 'paragraph', text: '4:00pm: Bride and Groom meet for first look.' },
+                    { type: 'paragraph', text: '4:00pm: Guests arrive and are seated.' }
                 ], links: []
             },
             {
-                id: 9, time: '3:30 PM', title: 'Guests Arrive & Welcome Drinks', location: 'Venue Courtyard', responsible: ['Groomsmen'], teams: ['groomsmen', 'family'],
+                id: 7, time: '4:30 PM', title: 'Wedding Ceremony', location: 'Ceremony Location', responsible: ['MC'], teams: ['all'],
                 description: [
-                    { type: 'paragraph', text: 'Guests begin arriving via private transport.' },
-                    { type: 'paragraph', text: 'Groomsmen to act as ushers, directing guests to the courtyard for welcome drinks before taking their seats.' }
+                    { type: 'paragraph', text: 'The Ceremony begins! Unplugged ceremony (please keep phones away).' }
                 ], links: []
             },
             {
-                id: 10, time: '4:00 PM', title: 'Wedding Ceremony', location: 'The Chapel', responsible: ['Celebrant'], teams: ['all'],
+                id: 8, time: '6:15 PM', title: 'Wedding Reception Starts!', location: 'Main Hall', responsible: ['MC'], teams: ['all'],
                 description: [
-                    { type: 'paragraph', text: 'The Ceremony begins! Unplugged ceremony (please keep phones away).' },
-                    { type: 'paragraph', text: 'Group Photo Priority List (immediately following ceremony):' },
-                    { type: 'checklist', items: [
-                        'Immediate family (Bride)',
-                        'Immediate family (Groom)',
-                        'Extended family (Both sides)',
-                        'Full Bridal Party',
-                        'Bridesmaids only',
-                        'Groomsmen only',
-                        'University Friends'
-                    ]}
+                    { type: 'paragraph', text: 'Doors open and guests take their seats. Grand Entrances at 6:30pm!' }
                 ], links: []
             },
             {
-                id: 11, time: '5:00 PM', title: 'Cocktail Hour', location: 'The Terrace', responsible: ['Venue Coordinator'], teams: ['all'],
+                id: 9, time: '8:45 PM', title: 'Cake Cutting & First Dance', location: 'Main Hall', responsible: ['Bride', 'Groom'], teams: ['all'],
                 description: [
-                    { type: 'paragraph', text: 'Drinks, canapés, and lawn games begin for guests.' },
-                    { type: 'paragraph', text: 'Bridal party to sneak away for sunset portraits near the lake.' }
+                    { type: 'paragraph', text: 'Cake cutting near the dance floor, moving immediately into the First Dance.' }
                 ], links: []
             },
             {
-                id: 12, time: '6:15 PM', title: 'Wedding Reception Starts!', location: 'Main Hall', responsible: ['MC'], teams: ['all'],
-                description: [
-                    { type: 'paragraph', text: 'Doors open and guests take their seats.' },
-                    { type: 'paragraph', text: '6:30pm: Grand Entrances! Order:' },
-                    { type: 'list', items: [
-                        'Bridesmaid 1 & Groomsman 1',
-                        'Maid of Honor & Best Man',
-                        'The New Mr. & Mrs!'
-                    ]},
-                    { type: 'paragraph', text: '6:40pm: House keeping by MC' },
-                    { type: 'checklist', items: ['Welcome', 'Bathrooms', 'Menu format', 'Open Bar rules', 'Guestbook reminder'] }
-                ], links: []
-            },
-            {
-                id: 13, time: '7:00 PM', title: 'Dinner Service', location: 'Main Hall', responsible: ['Venue Coordinator'], teams: ['all'],
-                description: [
-                    { type: 'paragraph', text: 'Entrees and Mains are served (Alternate drop).' }
-                ], links: []
-            },
-            {
-                id: 14, time: '8:00 PM', title: 'Speeches & Toasts', location: 'Main Hall', responsible: ['MC'], teams: ['family', 'bridesmaids', 'groomsmen', 'bride', 'groom'],
-                description: [
-                    { type: 'paragraph', text: 'Ensure glasses are charged!' },
-                    { type: 'list', items: [
-                        'Father of the Bride',
-                        'Maid of Honor',
-                        'Best Man',
-                        'Groom & Bride Joint Speech'
-                    ]}
-                ], links: []
-            },
-            {
-                id: 15, time: '8:45 PM', title: 'Cake Cutting & First Dance', location: 'Main Hall', responsible: ['Bride', 'Groom'], teams: ['all'],
-                description: [
-                    { type: 'paragraph', text: 'Cake cutting near the dance floor, moving immediately into the First Dance.' },
-                    { type: 'paragraph', text: 'DJ to invite everyone onto the dance floor halfway through the song.' }
-                ], links: []
-            },
-            {
-                id: 16, time: '9:00 PM', title: 'Dance Floor is Open!', location: 'Main Hall', responsible: ['DJ'], teams: ['all'],
-                description: [
-                    { type: 'paragraph', text: 'TIME TO PARTY! Photobooth is also officially open in the corner.' }
-                ], links: []
-            },
-            {
-                id: 17, time: '10:45 PM', title: 'Farewell Sparkler Exit', location: 'Venue Driveway', responsible: ['MC', 'Best Man'], teams: ['all'],
+                id: 10, time: '10:45 PM', title: 'Farewell Sparkler Exit', location: 'Venue Driveway', responsible: ['MC', 'Best Man'], teams: ['all'],
                 description: [
                     { type: 'paragraph', text: '10:30pm: Last Drinks called.' },
-                    { type: 'paragraph', text: '10:40pm: Guests line up outside for the sparkler exit.' },
-                    { type: 'paragraph', text: '10:45pm: Bride & Groom depart. Shuttle bus boards for hotel return.' }
+                    { type: 'paragraph', text: '10:45pm: Bride & Groom depart.' }
                 ], links: []
             }
         ];
         // ============================================================================
 
-        // --- ICONS ---
+        const THEMES = {
+            classic: { bg: 'bg-stone-50', text: 'text-stone-900', light: 'bg-stone-100', border: 'border-stone-200', accent: 'bg-black text-white border-black', accentText: 'text-black', fill: 'fill-stone-200', overlay: 'bg-stone-900' },
+            rose: { bg: 'bg-rose-50', text: 'text-rose-900', light: 'bg-rose-100', border: 'border-rose-200', accent: 'bg-rose-700 text-white border-rose-700', accentText: 'text-rose-700', fill: 'fill-rose-200', overlay: 'bg-rose-950' },
+            sage: { bg: 'bg-emerald-50', text: 'text-emerald-900', light: 'bg-emerald-100', border: 'border-emerald-200', accent: 'bg-emerald-700 text-white border-emerald-700', accentText: 'text-emerald-700', fill: 'fill-emerald-200', overlay: 'bg-emerald-950' },
+            ocean: { bg: 'bg-sky-50', text: 'text-sky-900', light: 'bg-sky-100', border: 'border-sky-200', accent: 'bg-sky-700 text-white border-sky-700', accentText: 'text-sky-700', fill: 'fill-sky-200', overlay: 'bg-sky-950' }
+        };
+        const activeTheme = THEMES[CONFIG.theme] || THEMES.classic;
+
+        const MODAL_THEMES = {
+            ivory: { bg: 'bg-[#faf9f6]', text: 'text-stone-600', title: 'text-stone-800', btn: 'bg-white hover:bg-stone-100 text-stone-800 border border-stone-200', iconBg: 'bg-white shadow-sm', iconColor: 'text-stone-300 fill-stone-100', signoff: 'text-stone-400', border: 'border-stone-200', checkBg: 'bg-white', checkBorder: 'border-stone-200 group-hover:border-stone-300', checkFill: 'bg-stone-800 border-stone-800 text-white', checkedText: 'opacity-40 line-through decoration-stone-300', progressBg: 'bg-stone-200', progressFill: 'bg-stone-800' },
+            blush: { bg: 'bg-[#fffafa]', text: 'text-[#8a7a7a]', title: 'text-[#5a4a4a]', btn: 'bg-[#fcf5f5] hover:bg-[#f5ebeb] text-[#8a7a7a] border border-[#f5ebeb]', iconBg: 'bg-white', iconColor: 'text-[#e8d5d5] fill-[#fcf5f5]', signoff: 'text-[#c2afaf]', border: 'border-[#f5ebeb]', checkBg: 'bg-white/80', checkBorder: 'border-[#e8d5d5] group-hover:border-[#d9c1c1]', checkFill: 'bg-[#bca0a0] border-[#bca0a0] text-white', checkedText: 'opacity-50 line-through decoration-[#bca0a0]', progressBg: 'bg-[#f5ebeb]', progressFill: 'bg-[#bca0a0]' },
+            dark: { bg: 'bg-stone-950', text: 'text-stone-300', title: 'text-white', btn: 'bg-stone-800 hover:bg-stone-700 text-white', iconBg: 'bg-stone-900', iconColor: 'text-stone-600 fill-stone-800', signoff: 'text-stone-500', border: 'border-stone-800', checkBg: 'bg-stone-900/50', checkBorder: 'border-stone-700 group-hover:border-stone-500', checkFill: 'bg-white border-white text-black', checkedText: 'opacity-30 line-through decoration-stone-600', progressBg: 'bg-stone-900', progressFill: 'bg-stone-300' },
+            charcoal: { bg: 'bg-[#1c1c1e]', text: 'text-[#a1a1aa]', title: 'text-white', btn: 'bg-[#27272a] hover:bg-[#3f3f46] text-white', iconBg: 'bg-[#27272a]', iconColor: 'text-[#52525b] fill-[#18181b]', signoff: 'text-[#71717a]', border: 'border-[#27272a]', checkBg: 'bg-[#27272a]/50', checkBorder: 'border-[#3f3f46] group-hover:border-[#52525b]', checkFill: 'bg-white border-white text-black', checkedText: 'opacity-40 line-through decoration-[#71717a]', progressBg: 'bg-[#27272a]', progressFill: 'bg-[#a1a1aa]' }
+        };
+
         const Icons = {
             ChevronDown: ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m6 9 6 6 6-6"/></svg>,
             ChevronUp: ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m18 15-6-6-6 6"/></svg>,
-            Heart: ({ className, fillClass }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`${className} ${fillClass}`}><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>,
+            Heart: ({ className, fillClass, onClick }) => <svg onClick={onClick} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`${className} ${fillClass}`}><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>,
             Clock: ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>,
             Search: ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>,
             X: ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>,
@@ -308,22 +223,12 @@
             Lock: ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
         };
 
-        // --- MODAL THEMES (For Easter Eggs) ---
-        const MODAL_THEMES = {
-            neutral: { bg: 'bg-white', text: 'text-stone-800', title: 'text-stone-900', btn: 'bg-stone-100 hover:bg-stone-200 text-stone-800', iconBg: 'bg-stone-50', iconColor: 'text-stone-300 fill-stone-100', signoff: 'text-stone-400', border: 'border-stone-200', checkBg: 'bg-stone-50', checkBorder: 'border-stone-300 group-hover:border-stone-400', checkFill: 'bg-stone-800 border-stone-800 text-white', checkedText: 'opacity-40 line-through decoration-stone-300', progressBg: 'bg-stone-200', progressFill: 'bg-stone-800' },
-            blush: { bg: 'bg-[#fff5f5]', text: 'text-[#6b5a5a]', title: 'text-[#4a3a3a]', btn: 'bg-[#f5e6e6] hover:bg-[#ebdada] text-[#6b5a5a]', iconBg: 'bg-white', iconColor: 'text-[#e2caca] fill-[#f9ecec]', signoff: 'text-[#b89f9f]', border: 'border-[#f2e1e1]', checkBg: 'bg-white/60', checkBorder: 'border-[#e2caca] group-hover:border-[#d4b4b4]', checkFill: 'bg-[#d4b4b4] border-[#d4b4b4] text-white', checkedText: 'opacity-50 line-through decoration-[#d4b4b4]', progressBg: 'bg-[#f2e1e1]', progressFill: 'bg-[#d4b4b4]' },
-            dark: { bg: 'bg-stone-950', text: 'text-stone-300', title: 'text-white', btn: 'bg-stone-800 hover:bg-stone-700 text-white', iconBg: 'bg-stone-900', iconColor: 'text-stone-600 fill-stone-800', signoff: 'text-stone-500', border: 'border-stone-800', checkBg: 'bg-stone-900/50', checkBorder: 'border-stone-700 group-hover:border-stone-500', checkFill: 'bg-white border-white text-black', checkedText: 'opacity-30 line-through decoration-stone-600', progressBg: 'bg-stone-900', progressFill: 'bg-stone-300' }
-        };
-
-        // --- CUSTOM KEYPAD SCREEN ---
         const PinScreen = ({ onAccess }) => {
             const [pin, setPin] = useState('');
             const [error, setError] = useState(false);
             const [isUnlocking, setIsUnlocking] = useState(false);
 
-            const handleKeyPress = (num) => {
-                if (pin.length < 4) setPin(prev => prev + num);
-            };
+            const handleKeyPress = (num) => { if (pin.length < 4) setPin(prev => prev + num); };
             const handleClear = () => setPin('');
             const handleEnter = () => {
                 if (pin === CONFIG.pinCode) {
@@ -337,45 +242,38 @@
             };
 
             return (
-                <div className={`min-h-screen flex flex-col items-center justify-center px-4 bg-stone-50 transition-all duration-700 ease-in-out ${isUnlocking ? 'opacity-0 scale-110 blur-sm pointer-events-none' : 'opacity-100 scale-100'}`}>
+                <div className={`min-h-screen flex flex-col items-center justify-center px-4 ${activeTheme.bg} transition-all duration-700 ease-in-out ${isUnlocking ? 'opacity-0 scale-110 blur-sm pointer-events-none' : 'opacity-100 scale-100'}`}>
                     <div className="text-center mb-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
                         <Icons.Lock className="w-8 h-8 mx-auto mb-6 text-stone-300" />
                         <h1 className="text-4xl sm:text-5xl font-serif text-black mb-3">{CONFIG.coupleNames}</h1>
                         <p className="text-stone-500 font-light tracking-wide">{CONFIG.displayDate}</p>
                         <p className="text-stone-400 font-light text-sm mt-1">{CONFIG.weddingLocation}</p>
                     </div>
-                    
                     <div className={`flex justify-center gap-4 mb-8 h-4 transition-transform duration-300 ${error ? 'animate-shake' : ''}`}>
-                        {[0, 1, 2, 3].map(i => (
-                            <div key={i} className={`w-4 h-4 rounded-full border-2 transition-all duration-200 ${pin.length > i ? 'bg-stone-800 border-stone-800 scale-110' : 'border-stone-300 bg-transparent'}`} />
-                        ))}
+                        {[0, 1, 2, 3].map(i => <div key={i} className={`w-4 h-4 rounded-full border-2 transition-all duration-200 ${pin.length > i ? 'bg-stone-800 border-stone-800 scale-110' : 'border-stone-300 bg-transparent'}`} />)}
                     </div>
                     {error && <p className="text-rose-500 text-sm font-medium absolute mt-[-20px] transition-opacity">Incorrect PIN</p>}
-
                     <div className="grid grid-cols-3 gap-4 sm:gap-6 max-w-[280px] w-full mx-auto mt-4 animate-in fade-in slide-in-from-bottom-8 duration-700 delay-150">
-                        {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(num => (
-                            <button key={num} onClick={() => handleKeyPress(num)} className="aspect-square rounded-full bg-white shadow-sm text-2xl font-light text-stone-700 active:bg-stone-200 active:scale-95 transition-all hover:shadow-md flex items-center justify-center">{num}</button>
-                        ))}
+                        {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(num => <button key={num} onClick={() => handleKeyPress(num)} className="aspect-square rounded-full bg-white shadow-sm text-2xl font-light text-stone-700 active:bg-stone-200 active:scale-95 transition-all hover:shadow-md flex items-center justify-center">{num}</button>)}
                         <button onClick={handleClear} className="aspect-square rounded-full text-stone-400 font-medium active:bg-stone-200 active:scale-95 transition-all flex items-center justify-center text-sm uppercase tracking-wider">Clear</button>
                         <button onClick={() => handleKeyPress(0)} className="aspect-square rounded-full bg-white shadow-sm text-2xl font-light text-stone-700 active:bg-stone-200 active:scale-95 transition-all hover:shadow-md flex items-center justify-center">0</button>
-                        <button onClick={handleEnter} className="aspect-square rounded-full bg-black text-white shadow-md active:opacity-80 active:scale-95 transition-all flex items-center justify-center"><Icons.ArrowRight className="w-8 h-8" /></button>
+                        <button onClick={handleEnter} className={`aspect-square rounded-full ${activeTheme.accent} shadow-md active:opacity-80 active:scale-95 transition-all flex items-center justify-center`}><Icons.ArrowRight className="w-8 h-8" /></button>
                     </div>
                 </div>
             );
         };
 
-        // --- MODALS ---
         const HelpfulLinksModal = ({ onClose }) => (
             <div className="fixed inset-0 bg-black/60 z-[100] flex items-center justify-center p-4 animate-in fade-in">
                 <div className="bg-white rounded-2xl w-full max-w-sm overflow-hidden shadow-2xl animate-in slide-in-from-bottom-8">
-                    <div className="bg-stone-100 px-6 py-4 flex justify-between items-center border-b border-stone-200">
+                    <div className={`${activeTheme.light} px-6 py-4 flex justify-between items-center border-b ${activeTheme.border}`}>
                         <h3 className="font-serif text-xl text-black">Helpful Links</h3>
                         <button onClick={onClose} className="p-1 rounded-full hover:bg-black/10 transition"><Icons.X className="w-5 h-5 text-stone-600" /></button>
                     </div>
                     <div className="p-6 space-y-3">
                         {CONFIG.helpfulLinks.map((link, i) => (
-                            <a key={i} href={link.url} target="_blank" className="flex items-center gap-3 p-4 rounded-xl border border-stone-200 hover:bg-stone-50 transition-colors group">
-                                <Icons.ExternalLink className="w-5 h-5 text-stone-400 group-hover:text-black transition-colors" />
+                            <a key={i} href={link.url} target="_blank" className={`flex items-center gap-3 p-4 rounded-xl border ${activeTheme.border} hover:${activeTheme.light} transition-colors group`}>
+                                <Icons.ExternalLink className={`w-5 h-5 ${activeTheme.accentText} opacity-70 group-hover:opacity-100`} />
                                 <span className="font-medium text-stone-800">{link.title}</span>
                             </a>
                         ))}
@@ -384,63 +282,79 @@
             </div>
         );
 
-        const MessageModal = ({ data, onClose }) => {
-            const theme = MODAL_THEMES[data.theme] || MODAL_THEMES.neutral;
-            return (
-                <div className={`fixed inset-0 ${theme.bg} z-[100] overflow-hidden animate-in fade-in duration-500 flex flex-col items-center justify-center p-8 text-center`}>
-                    <button onClick={onClose} className={`absolute top-6 right-6 p-2 rounded-full transition-colors ${theme.btn}`}><Icons.X className="w-6 h-6" /></button>
-                    <div className="max-w-lg space-y-8 animate-in slide-in-from-bottom-8 duration-700 delay-100">
-                        <div className="flex justify-center mb-6"><div className={`p-4 rounded-full ${theme.iconBg}`}><Icons.Heart className={`w-16 h-16 ${theme.iconColor}`} /></div></div>
-                        <h2 className={`text-4xl font-serif mb-4 tracking-wide ${theme.title}`}>{data.title}</h2>
-                        <div className={`space-y-6 font-light text-lg leading-relaxed ${theme.text}`}>
-                            {data.messageLines.map((line, i) => (<p key={i} className={i === 0 ? `text-2xl font-serif italic ${theme.title}` : ""}>{line}</p>))}
-                        </div>
-                        <div className="pt-12"><p className={`${theme.signoff} text-xs font-mono uppercase tracking-[0.3em]`}>{data.messageSignoff}</p></div>
-                    </div>
-                </div>
-            );
-        };
-
         const ChecklistModal = ({ data, onClose }) => {
-            const theme = MODAL_THEMES[data.theme] || MODAL_THEMES.neutral;
-            const [items, setItems] = useState(data.items.map((item, idx) => ({ id: idx, text: item, checked: false })));
-            const toggleItem = (id) => setItems(items.map(item => item.id === id ? { ...item, checked: !item.checked } : item));
-            const progress = Math.round((items.filter(i => i.checked).length / items.length) * 100);
+            const theme = MODAL_THEMES[data.theme] || MODAL_THEMES.ivory;
             
+            // Mode switch for Bride (Checklist vs Message)
+            const isWeddingDayToday = new Date().toDateString() === new Date(CONFIG.weddingDate).toDateString();
+            const hasMessage = data.messageLines && data.messageLines.length > 0;
+            const [mode, setMode] = useState(hasMessage && isWeddingDayToday ? 'message' : 'checklist');
+            
+            const initialItems = data.items ? data.items.map((item, idx) => ({ id: idx, text: item, checked: false })) : [];
+            const [items, setItems] = useState(initialItems);
+            const toggleItem = (id) => setItems(items.map(item => item.id === id ? { ...item, checked: !item.checked } : item));
+            const progress = items.length > 0 ? Math.round((items.filter(i => i.checked).length / items.length) * 100) : 0;
+
             return (
                 <div className={`fixed inset-0 ${theme.bg} z-[100] overflow-y-auto animate-in fade-in duration-300`}>
-                    <div className="max-w-2xl mx-auto p-6 pt-12">
-                        <div className="flex justify-between items-start mb-6">
-                            <div><h2 className={`text-4xl font-serif mb-2 ${theme.title}`}>{data.title}</h2><p className={`${theme.signoff} font-mono text-sm tracking-widest uppercase`}>Protocol</p></div>
-                            <button onClick={onClose} className={`absolute top-6 right-6 p-2 rounded-full transition-colors ${theme.btn}`}><Icons.X className="w-6 h-6" /></button>
-                        </div>
-                        <div className={`sticky top-0 z-30 ${theme.bg} pb-6 pt-2 mb-2 border-b ${theme.border}`}>
-                            <div className={`flex justify-between text-xs font-mono mb-2 uppercase tracking-wider ${theme.signoff}`}>
-                                <span>{progress === 100 ? "Ready!" : "Readiness"}</span>
-                                <span>{progress}%</span>
-                            </div>
-                            <div className={`h-1 ${theme.progressBg} rounded-full overflow-hidden`}><div className={`h-full ${theme.progressFill} transition-all duration-500 ease-out`} style={{ width: `${progress}%` }}></div></div>
-                        </div>
-                        <div className="space-y-3 py-4">
-                            {items.map(item => (
-                                <label key={item.id} className={`group flex items-center p-4 border rounded-xl cursor-pointer transition-all ${theme.checkBg} ${theme.border} hover:shadow-sm`}>
-                                    <input type="checkbox" className="hidden custom-checkbox" checked={item.checked} onChange={() => toggleItem(item.id)} />
-                                    <div className={`w-6 h-6 border-2 rounded-md flex items-center justify-center mr-4 transition-colors ${theme.checkBorder} ${item.checked ? theme.checkFill : ''}`}>
-                                        <Icons.Check className={`w-4 h-4 ${theme.bg} ${item.checked ? 'block' : 'hidden'}`} />
+                    <button onClick={onClose} className={`fixed top-6 right-6 z-[110] p-2 rounded-full transition-colors ${theme.btn}`}><Icons.X className="w-6 h-6" /></button>
+                    
+                    {mode === 'message' ? (
+                        <div className="min-h-screen flex flex-col items-center justify-center p-8 text-center animate-in fade-in zoom-in-95 duration-700">
+                            <div className="max-w-lg space-y-8">
+                                <div className="flex justify-center mb-6"><div className={`p-4 rounded-full ${theme.iconBg}`}><Icons.Heart className={`w-16 h-16 ${theme.iconColor}`} /></div></div>
+                                <h2 className={`text-4xl font-serif mb-4 tracking-wide ${theme.title}`}>{data.title}</h2>
+                                <div className={`space-y-6 font-light text-lg leading-relaxed ${theme.text}`}>
+                                    {data.messageLines.map((line, i) => (<p key={i} className={i === 0 ? `text-2xl font-serif italic ${theme.title}` : ""}>{line}</p>))}
+                                </div>
+                                <div className="pt-12"><p className={`${theme.signoff} text-xs font-mono uppercase tracking-[0.3em]`}>{data.signoff || data.footer}</p></div>
+                                
+                                {data.items && data.items.length > 0 && (
+                                    <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2">
+                                        <Icons.Heart className={`w-5 h-5 ${theme.iconColor} cursor-pointer opacity-30 hover:opacity-100 transition-opacity`} onClick={() => setMode('checklist')} />
                                     </div>
-                                    <span className={`text-lg font-light tracking-wide transition-opacity ${item.checked ? theme.checkedText : theme.text}`}>{item.text}</span>
-                                </label>
-                            ))}
+                                )}
+                            </div>
                         </div>
-                        {data.footer && <div className="mt-12 text-center pb-8"><p className={`${theme.signoff} text-xs font-mono uppercase tracking-[0.2em]`}>{data.footer}</p></div>}
-                    </div>
+                    ) : (
+                        <div className="max-w-2xl mx-auto p-6 pt-12 min-h-screen flex flex-col">
+                            <div className="flex justify-between items-start mb-6 pr-12">
+                                <div><h2 className={`text-4xl font-serif mb-2 ${theme.title}`}>{data.title}</h2><p className={`${theme.signoff} font-mono text-sm tracking-widest uppercase`}>Checklist</p></div>
+                            </div>
+                            <div className={`sticky top-0 z-30 ${theme.bg} pb-6 pt-2 mb-2 border-b ${theme.border}`}>
+                                <div className={`flex justify-between text-xs font-mono mb-2 uppercase tracking-wider ${theme.signoff}`}>
+                                    <span>{progress === 100 ? "Ready!" : "Readiness"}</span>
+                                    <span>{progress}%</span>
+                                </div>
+                                <div className={`h-1 ${theme.progressBg} rounded-full overflow-hidden`}><div className={`h-full ${theme.progressFill} transition-all duration-500 ease-out`} style={{ width: `${progress}%` }}></div></div>
+                            </div>
+                            <div className="space-y-3 py-4 flex-1">
+                                {items.map(item => (
+                                    <label key={item.id} className={`group flex items-center p-4 border rounded-xl cursor-pointer transition-all ${theme.checkBg} ${theme.border} hover:shadow-sm`}>
+                                        <input type="checkbox" className="hidden custom-checkbox" checked={item.checked} onChange={() => toggleItem(item.id)} />
+                                        <div className={`w-6 h-6 border-2 rounded-md flex items-center justify-center mr-4 transition-colors ${theme.checkBorder} ${item.checked ? theme.checkFill : ''}`}>
+                                            <Icons.Check className={`w-4 h-4 ${data.theme === 'dark' || data.theme === 'charcoal' ? 'text-black' : 'text-white'} ${item.checked ? 'block' : 'hidden'}`} />
+                                        </div>
+                                        <span className={`text-lg font-light tracking-wide transition-opacity ${item.checked ? theme.checkedText : theme.text}`}>{item.text}</span>
+                                    </label>
+                                ))}
+                            </div>
+                            {data.footer && <div className="mt-8 text-center pb-8"><p className={`${theme.signoff} text-xs font-mono uppercase tracking-[0.2em]`}>{data.footer}</p></div>}
+                            
+                            {hasMessage && (
+                                <div className="mt-auto text-center pb-6">
+                                    <Icons.Heart className={`w-5 h-5 mx-auto ${theme.iconColor} cursor-pointer opacity-30 hover:opacity-100 transition-opacity`} onClick={() => setMode('message')} />
+                                </div>
+                            )}
+                        </div>
+                    )}
                 </div>
             );
         };
 
-        // --- MAIN APP ---
         const WeddingTimeline = () => {
-            const [expandedEvent, setExpandedEvent] = useState(null);
+            // Updated to allow multiple expanded events
+            const [expandedEvents, setExpandedEvents] = useState([]);
             const [selectedFilters, setSelectedFilters] = useState(['all']);
             const [searchQuery, setSearchQuery] = useState('');
             const [expandAll, setExpandAll] = useState(false);
@@ -462,23 +376,17 @@
             useEffect(() => { const timer = setInterval(() => setCurrentTime(new Date()), 60000); return () => clearInterval(timer); }, []);
             
             useEffect(() => {
-                const handleScroll = () => setIsScrolled(window.scrollY > 100);
+                const handleScroll = () => setIsScrolled(window.scrollY > 120);
                 window.addEventListener('scroll', handleScroll);
                 return () => window.removeEventListener('scroll', handleScroll);
             }, []);
 
-            // Countdown Timer
             useEffect(() => {
                 const updateCountdown = () => {
                     const now = new Date();
                     const difference = weddingDate.getTime() - now.getTime();
                     if (difference > 0) {
-                        setCountdown({
-                            days: Math.floor(difference / (1000 * 60 * 60 * 24)),
-                            hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
-                            minutes: Math.floor((difference / 1000 / 60) % 60),
-                            seconds: Math.floor((difference / 1000) % 60)
-                        });
+                        setCountdown({ days: Math.floor(difference / (1000 * 60 * 60 * 24)), hours: Math.floor((difference / (1000 * 60 * 60)) % 24), minutes: Math.floor((difference / 1000 / 60) % 60), seconds: Math.floor((difference / 1000) % 60) });
                     } else { setCountdown({ days: 0, hours: 0, minutes: 0, seconds: 0 }); }
                 };
                 updateCountdown();
@@ -486,7 +394,7 @@
                 return () => clearInterval(timer);
             }, []);
 
-            // Gesture Swiping Logic (RESTRICTED TO STICKY HEADERS)
+            // Swipe logic restricted to Sticky Headers
             const [touchStart, setTouchStart] = useState(null);
             const [touchEnd, setTouchEnd] = useState(null);
             const minSwipeDistance = 50;
@@ -514,17 +422,23 @@
                 return hours * 60 + minutes; 
             };
 
-            const isWeddingDay = currentTime.toDateString() === weddingDate.toDateString(); 
+            const isWeddingDay = true; // Set to true for demo. Real app: currentTime.toDateString() === weddingDate.toDateString(); 
             const currentMinutes = currentTime.getHours() * 60 + currentTime.getMinutes();
 
-            // RENDER LOGIC
+            const getEventStatus = (eventTimeStr, nextEventTimeStr) => {
+                if (!isWeddingDay) return 'future';
+                const eMins = parseEventTime(eventTimeStr);
+                const nextMins = nextEventTimeStr ? parseEventTime(nextEventTimeStr) : 1440;
+                if (currentMinutes >= eMins && currentMinutes < nextMins) return 'now';
+                if (currentMinutes >= nextMins) return 'past';
+                return 'future';
+            };
+
             const renderDescriptionContent = (desc) => {
                 if (!desc) return null;
                 if (typeof desc === 'string') return <p className="text-stone-700 mt-4 leading-relaxed">{desc}</p>;
                 if (Array.isArray(desc)) {
-                    if (typeof desc[0] === 'string') {
-                        return <ul className="text-stone-700 mt-4 leading-relaxed list-none space-y-2">{desc.map((line, idx) => <li key={idx} className="flex items-start gap-2"><span className="text-stone-400 mt-1.5 w-1.5 h-1.5 rounded-full bg-stone-300 shrink-0"></span><span>{line}</span></li>)}</ul>;
-                    }
+                    if (typeof desc[0] === 'string') return <ul className="text-stone-700 mt-4 leading-relaxed list-none space-y-2">{desc.map((line, idx) => <li key={idx} className="flex items-start gap-2"><span className="text-stone-400 mt-1.5 w-1.5 h-1.5 rounded-full bg-stone-300 shrink-0"></span><span>{line}</span></li>)}</ul>;
                     if (typeof desc[0] === 'object') {
                         return (
                             <div className="mt-4 space-y-4">
@@ -544,73 +458,82 @@
             const filteredEvents = events.filter(event => {
                 const teamMatch = selectedFilters.includes('all') || event.teams.includes('all') || event.teams.some(team => selectedFilters.includes(team));
                 const searchTextMatches = (text) => text.toLowerCase().includes(searchQuery.toLowerCase());
-                
                 let descMatch = false;
                 if (typeof event.description === 'string') descMatch = searchTextMatches(event.description);
-                else if (Array.isArray(event.description)) {
-                    descMatch = event.description.some(item => typeof item === 'string' ? searchTextMatches(item) : (item.text && searchTextMatches(item.text)) || (item.items && item.items.some(i => searchTextMatches(i))));
-                }
-
+                else if (Array.isArray(event.description)) descMatch = event.description.some(item => typeof item === 'string' ? searchTextMatches(item) : (item.text && searchTextMatches(item.text)) || (item.items && item.items.some(i => searchTextMatches(i))));
                 const searchMatch = searchQuery === '' || searchTextMatches(event.title) || descMatch || searchTextMatches(event.location) || searchTextMatches(event.time) || (event.responsible && event.responsible.some(r => searchTextMatches(r)));
                 return teamMatch && searchMatch;
             });
 
-            const firstActiveIndex = filteredEvents.findIndex(event => !(isWeddingDay && parseEventTime(event.time) < currentMinutes - 30));
+            // Find current event for highlighting and auto-scrolling
+            let currentEventId = null;
+            if (isWeddingDay) {
+                for (let i = 0; i < filteredEvents.length; i++) {
+                    if (getEventStatus(filteredEvents[i].time, filteredEvents[i+1]?.time) === 'now') {
+                        currentEventId = filteredEvents[i].id;
+                        break;
+                    }
+                }
+                if (!currentEventId) {
+                    const next = filteredEvents.find(e => parseEventTime(e.time) > currentMinutes);
+                    if (next) currentEventId = next.id;
+                }
+            }
+            if (!isWeddingDay && filteredEvents.length > 0) currentEventId = filteredEvents[0].id;
+
+            // Auto-scroll effect
+            useEffect(() => {
+                window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+                if (activeRef.current && view === 'timeline') {
+                    setTimeout(() => activeRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' }), 500); 
+                }
+            }, [view]);
 
             const toggleFilter = (filterId) => {
-                // Easter Egg Triple-Tap Logic
                 if (CONFIG.checklists[filterId]) {
-                    if (!selectedFilters.includes(filterId)) {
-                        setSelectedFilters([filterId]); // Tap 1: Select
+                    const clicks = (filterClicks[filterId] || 0) + 1;
+                    if (clicks === 1 && !selectedFilters.includes(filterId)) {
+                        setSelectedFilters([filterId]); 
                         setFilterClicks({ [filterId]: 1 });
+                    } else if (clicks >= 3) {
+                        setActiveChecklist(filterId);
+                        setFilterClicks({});
                     } else {
-                        const newCount = (filterClicks[filterId] || 1) + 1;
-                        if (newCount >= 3) { // Tap 3: Open
-                            setActiveChecklist(filterId);
-                            setFilterClicks({ [filterId]: 1 }); // reset
-                        } else {
-                            setFilterClicks({ [filterId]: newCount }); // Tap 2: Lock (stays selected)
-                        }
+                        setFilterClicks({ [filterId]: clicks });
                     }
                     return; 
                 }
-
-                // Standard Toggle Logic
                 setFilterClicks({});
                 if (filterId === 'all') { setSelectedFilters(['all']); } 
                 else {
                     setSelectedFilters(prev => {
                         const cleanPrev = prev.filter(f => f !== 'all');
-                        if (prev.includes(filterId)) { 
-                            const newFilters = cleanPrev.filter(f => f !== filterId); 
-                            return newFilters.length === 0 ? ['all'] : newFilters; 
-                        } else { 
-                            return [...cleanPrev, filterId]; 
-                        }
+                        if (prev.includes(filterId)) { const newFilters = cleanPrev.filter(f => f !== filterId); return newFilters.length === 0 ? ['all'] : newFilters; } 
+                        else { return [...cleanPrev, filterId]; }
                     });
                 }
             };
 
-            const toggleExpandAll = () => { setExpandAll(!expandAll); if (!expandAll) setExpandedEvent(null); };
+            const toggleEvent = (id) => {
+                if (expandAll) return;
+                setExpandedEvents(prev => prev.includes(id) ? prev.filter(e => e !== id) : [...prev, id]);
+            };
+            const toggleExpandAll = () => { 
+                if (expandAll) { setExpandAll(false); setExpandedEvents([]); } 
+                else { setExpandAll(true); setExpandedEvents(filteredEvents.map(e => e.id)); }
+            };
 
             const layoutWidth = CONFIG.enableMapScreen ? 'w-[300%]' : 'w-[200%]';
-            const translation = CONFIG.enableMapScreen 
-                ? (view === 'map' ? '0' : view === 'timeline' ? '33.333' : '66.666')
-                : (view === 'timeline' ? '0' : '50');
+            const translation = CONFIG.enableMapScreen ? (view === 'map' ? '0' : view === 'timeline' ? '33.333' : '66.666') : (view === 'timeline' ? '0' : '50');
             const panelWidth = CONFIG.enableMapScreen ? 'w-1/3' : 'w-1/2';
 
             return (
                 <div className={`overflow-x-hidden w-full relative min-h-screen bg-stone-50`}>
                     
-                    {/* DYNAMIC MODALS (Easter Eggs & Info) */}
-                    {activeChecklist && (
-                        (activeChecklist === 'bride' && isWeddingDay) || CONFIG.checklists[activeChecklist].type === 'message'
-                            ? <MessageModal data={CONFIG.checklists[activeChecklist]} onClose={() => setActiveChecklist(null)} />
-                            : <ChecklistModal data={CONFIG.checklists[activeChecklist]} onClose={() => setActiveChecklist(null)} />
-                    )}
+                    {activeChecklist && <ChecklistModal data={CONFIG.checklists[activeChecklist]} onClose={() => setActiveChecklist(null)} />}
                     {showLinks && <HelpfulLinksModal onClose={() => setShowLinks(false)} />}
 
-                    {/* --- DESKTOP NAVIGATION ARROWS --- */}
+                    {/* --- DESKTOP NAV ARROWS --- */}
                     <div className="hidden md:block fixed top-1/2 left-8 z-50 transform -translate-y-1/2">
                         {view === 'timeline' && CONFIG.enableMapScreen && <button onClick={() => setView('map')} className="bg-white/80 backdrop-blur shadow-lg p-4 rounded-full hover:bg-white transition-all hover:scale-110 border border-stone-100"><Icons.ArrowLeft className="w-6 h-6 text-stone-600" /></button>}
                         {view === 'vendors' && <button onClick={() => setView('timeline')} className="bg-white/80 backdrop-blur shadow-lg p-4 rounded-full hover:bg-white transition-all hover:scale-110 border border-stone-100"><Icons.ArrowLeft className="w-6 h-6 text-stone-600" /></button>}
@@ -623,7 +546,7 @@
                     {/* --- SLIDING CONTAINER --- */}
                     <div className={`flex ${layoutWidth} transition-transform duration-500 ease-in-out`} style={{ transform: `translateX(-${translation}%)` }}>
                         
-                        {/* --- VIEW 1: MAP (ONLY RENDER IF ENABLED) --- */}
+                        {/* --- VIEW 1: MAP --- */}
                         {CONFIG.enableMapScreen && (
                             <div className={`${panelWidth} shrink-0 h-screen relative bg-stone-200 flex flex-col`}>
                                 <div className="absolute top-6 left-6 z-10"><button onClick={() => setView('timeline')} className="bg-white/90 p-3 rounded-full shadow-md"><Icons.ArrowRight className="w-6 h-6 text-stone-600" /></button></div>
@@ -636,30 +559,27 @@
                             </div>
                         )}
 
-                        {/* --- VIEW 2: TIMELINE (CENTER) --- */}
-                        <div className={`${panelWidth} shrink-0 relative z-20 min-h-screen bg-stone-50`}>
+                        {/* --- VIEW 2: TIMELINE --- */}
+                        <div className={`${panelWidth} shrink-0 relative z-20 min-h-screen bg-stone-50 flex flex-col`}>
                             
-                            {/* SMART STICKY HEADER (Names + Filter Bar) */}
-                            <div 
-                                className="sticky top-0 z-50 w-full shadow-sm flex flex-col" 
-                                onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd}
-                            >
-                                {/* Header Info */}
-                                <header className={`bg-white/95 backdrop-blur overflow-hidden transition-all duration-300 ${isScrolled ? 'max-h-0 opacity-0' : 'max-h-64 opacity-100 border-b border-stone-200'}`}>
-                                    <div className="w-full flex justify-center pt-3 md:hidden"><div className="w-12 h-1.5 bg-stone-200 rounded-full"></div></div>
-                                    <div className="max-w-4xl mx-auto px-4 py-6 pb-6 pt-4 text-center select-none">
+                            {/* UNIFIED STICKY HEADER */}
+                            <div className="sticky top-0 z-50 w-full bg-white/95 backdrop-blur shadow-sm border-b border-stone-200" onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd}>
+                                {/* Drag Pill */}
+                                <div className="w-full flex justify-center pt-3 md:hidden"><div className="w-12 h-1.5 bg-stone-200 rounded-full"></div></div>
+
+                                {/* Dynamic Titles */}
+                                <div className="max-w-4xl mx-auto px-4 select-none">
+                                    <div className={`overflow-hidden transition-all duration-300 flex flex-col items-center justify-center ${isScrolled ? 'max-h-0 opacity-0' : 'max-h-64 opacity-100 py-6 pt-4'}`}>
                                         <h1 className="text-4xl font-serif text-black mb-2">{CONFIG.coupleNames}</h1>
                                         <p className="text-stone-600 font-light tracking-wide">{CONFIG.displayDate}</p>
                                         <p className="text-stone-400 font-light text-sm mt-1">{CONFIG.weddingLocation}</p>
-                                        
                                         {countdown.days > 0 || countdown.hours > 0 || countdown.minutes > 0 ? (
                                             <div className="mt-4 flex items-center justify-center gap-4">
                                                 <Icons.Clock className="w-4 h-4 text-stone-400" />
                                                 <div className="flex gap-3 text-sm">
-                                                    {countdown.days > 0 && <div className="flex flex-col items-center"><span className="text-2xl font-serif text-black">{countdown.days}</span><span className="text-xs text-stone-500 uppercase tracking-wide">Days</span></div>}
+                                                    <div className="flex flex-col items-center"><span className="text-2xl font-serif text-black">{countdown.days}</span><span className="text-xs text-stone-500 uppercase tracking-wide">Days</span></div>
                                                     <div className="flex flex-col items-center"><span className="text-2xl font-serif text-black">{countdown.hours}</span><span className="text-xs text-stone-500 uppercase tracking-wide">Hours</span></div>
-                                                    <div className="flex flex-col items-center"><span className="text-2xl font-serif text-black">{countdown.minutes}</span><span className="text-xs text-stone-500 uppercase tracking-wide">Minutes</span></div>
-                                                    <div className="flex flex-col items-center"><span className="text-2xl font-serif text-black">{countdown.seconds}</span><span className="text-xs text-stone-500 uppercase tracking-wide">Seconds</span></div>
+                                                    <div className="flex flex-col items-center"><span className="text-2xl font-serif text-black">{countdown.minutes}</span><span className="text-xs text-stone-500 uppercase tracking-wide">Mins</span></div>
                                                 </div>
                                             </div>
                                         ) : isWeddingDay ? (
@@ -668,76 +588,75 @@
                                             <div className="mt-4"><p className="text-sm text-stone-500">The big day has arrived!</p></div>
                                         )}
                                     </div>
-                                </header>
 
-                                {/* Filter Bar (Always visible) */}
-                                <div className={`bg-white/95 backdrop-blur w-full transition-all duration-300 ${isScrolled ? 'border-b border-stone-200 shadow-sm' : ''}`}>
-                                    <div className="max-w-4xl mx-auto px-4">
-                                        <div className="flex items-center justify-between w-full">
-                                            {/* Scroll to Top Button (appears when scrolled) */}
-                                            {isScrolled && (
-                                                <button onClick={() => window.scrollTo({top:0, behavior:'smooth'})} className="py-4 pr-4 pl-2 text-stone-400 hover:text-black transition-colors md:hidden">
-                                                    <Icons.ArrowUp className="w-5 h-5" />
-                                                </button>
-                                            )}
-
-                                            <button onClick={() => { if(isScrolled) window.scrollTo({top:0, behavior:'smooth'}); setShowFilters(!showFilters); }} className="py-4 flex-1 flex items-center justify-between text-stone-600 hover:text-black transition-colors">
-                                                <div className="flex items-center gap-2"><Icons.Search className="w-4 h-4" /><span className="font-serif text-sm uppercase tracking-wider">Search & Filters</span></div>
-                                                {showFilters ? <Icons.ChevronUp className="w-5 h-5" /> : <Icons.ChevronDown className="w-5 h-5" />}
-                                            </button>
-                                            
-                                            <div className="w-px h-6 bg-stone-200 mx-4"></div>
-                                            <button onClick={() => setShowLinks(true)} className="py-4 flex items-center gap-2 text-stone-600 hover:text-black">
-                                                <Icons.Info className="w-5 h-5" />
-                                                <span className="hidden sm:inline font-serif text-sm uppercase tracking-wider">Info</span>
-                                            </button>
-                                        </div>
-
-                                        {showFilters && (
-                                            <div className="pb-4 animate-in slide-in-from-top-2 duration-200">
-                                                <div className="mb-4">
-                                                    <input type="text" placeholder="Search events, locations, or times..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)} className="w-full px-4 py-2 rounded-lg border border-stone-300 focus:outline-none focus:border-black transition-colors"/>
-                                                </div>
-                                                <div className="flex flex-wrap gap-2 justify-center items-center">
-                                                    {CONFIG.filters.map(filter => {
-                                                        const isSelected = selectedFilters.includes(filter.id);
-                                                        const btnClass = isSelected ? 'bg-black text-white shadow-md' : `bg-stone-100 text-stone-700 hover:bg-stone-200`;
-                                                        return (
-                                                            <button key={filter.id} onClick={() => toggleFilter(filter.id)} className={`px-4 py-2 rounded-full text-sm font-light tracking-wide transition-all duration-200 ${btnClass}`}>{filter.label}</button>
-                                                        );
-                                                    })}
-                                                    <div className="w-px h-6 bg-stone-300 mx-2"></div>
-                                                    <button onClick={toggleExpandAll} className="px-4 py-2 rounded-full text-sm font-light tracking-wide transition-all bg-stone-800 text-white hover:bg-black shadow-md">{expandAll ? 'Collapse All' : 'Expand All'}</button>
-                                                </div>
-                                            </div>
-                                        )}
+                                    {/* Shrunk Nav Bar (Visible on scroll) */}
+                                    <div className={`flex items-center justify-between w-full transition-all duration-300 ${isScrolled ? 'py-4 opacity-100' : 'h-0 opacity-0 pointer-events-none'}`}>
+                                        <button onClick={() => window.scrollTo({top:0, behavior:'smooth'})} className="p-2 -ml-2 text-stone-400 hover:text-black">
+                                            <Icons.ArrowUp className="w-5 h-5" />
+                                        </button>
+                                        <h1 className="text-xl font-serif text-black truncate">{CONFIG.coupleNames}</h1>
+                                        <button onClick={() => { window.scrollTo({top:0, behavior:'smooth'}); setShowFilters(true); }} className="p-2 -mr-2 text-stone-400 hover:text-black">
+                                            <Icons.Search className="w-5 h-5" />
+                                        </button>
                                     </div>
+                                </div>
+
+                                {/* Filter Bar */}
+                                <div className={`max-w-4xl mx-auto px-4 transition-all duration-300 ${isScrolled ? 'h-0 opacity-0 overflow-hidden' : ''}`}>
+                                    <div className="flex items-center justify-between w-full pb-4">
+                                        <button onClick={() => setShowFilters(!showFilters)} className="py-2 flex-1 flex items-center justify-between text-stone-600 hover:text-black">
+                                            <div className="flex items-center gap-2"><Icons.Search className="w-4 h-4" /><span className="font-serif text-sm uppercase tracking-wider">Search & Filters</span></div>
+                                            {showFilters ? <Icons.ChevronUp className="w-5 h-5" /> : <Icons.ChevronDown className="w-5 h-5" />}
+                                        </button>
+                                        <div className="w-px h-6 bg-stone-200 mx-4"></div>
+                                        <button onClick={() => setShowLinks(true)} className="py-2 flex items-center gap-2 text-stone-600 hover:text-black">
+                                            <Icons.Info className="w-5 h-5" /><span className="hidden sm:inline font-serif text-sm uppercase tracking-wider">Info</span>
+                                        </button>
+                                    </div>
+
+                                    {showFilters && (
+                                        <div className="pb-6 animate-in slide-in-from-top-2 border-t border-stone-100 pt-4">
+                                            <div className="mb-4">
+                                                <input type="text" placeholder="Search events, locations..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)} className="w-full px-4 py-2 rounded-lg border border-stone-300 focus:border-black outline-none bg-stone-50"/>
+                                            </div>
+                                            <div className="flex flex-wrap gap-2 justify-center">
+                                                {CONFIG.filters.map(filter => (
+                                                    <button key={filter.id} onClick={() => toggleFilter(filter.id)} className={`px-4 py-2 rounded-full text-sm font-light tracking-wide transition-all ${selectedFilters.includes(filter.id) ? activeTheme.accent : 'bg-stone-100 text-stone-700 hover:bg-stone-200'}`}>
+                                                        {filter.label}
+                                                    </button>
+                                                ))}
+                                                <div className="w-px h-6 bg-stone-300 mx-2 mt-1"></div>
+                                                <button onClick={toggleExpandAll} className="px-4 py-2 rounded-full text-sm font-light tracking-wide bg-stone-800 text-white hover:bg-black shadow-md">{expandAll ? 'Collapse All' : 'Expand All'}</button>
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
 
                             {/* Timeline List */}
-                            <div className="max-w-3xl mx-auto px-4 py-8 pb-32">
+                            <div className="max-w-3xl mx-auto w-full px-4 py-8 pb-32 flex-1">
                                 <div className="relative">
-                                    <div className="absolute left-12 top-0 bottom-0 w-px bg-stone-300 transform -translate-x-1/2"></div>
+                                    <div className="absolute left-[3.25rem] top-0 bottom-0 w-px bg-stone-300"></div>
                                     <div className="space-y-4">
-                                        {filteredEvents.map((event, index) => {
-                                            const isExpanded = expandedEvent === event.id || expandAll;
-                                            const isPast = isWeddingDay && parseEventTime(event.time) < currentMinutes - 30;
-                                            const isFirstActive = index === firstActiveIndex;
+                                        {filteredEvents.map((event) => {
+                                            const isExpanded = expandAll || expandedEvents.includes(event.id);
+                                            const status = getEventStatus(event.time, events[events.indexOf(event)+1]?.time);
+                                            const isPast = status === 'past';
+                                            const isNow = status === 'now';
 
                                             return (
-                                                <div key={event.id} ref={isFirstActive ? activeRef : null} className={`relative transition-all duration-500 ease-in-out ${isExpanded ? 'flex flex-col items-center gap-4 py-4 z-20' : 'pl-32'} ${isPast ? 'opacity-60 grayscale' : ''}`}>
-                                                    <div className={`transition-all duration-500 ease-in-out z-10 ${isExpanded ? 'relative w-auto transform translate-x-0' : 'absolute left-0 w-24 flex justify-center mt-1'}`}>
-                                                        <div className={`px-3 py-1.5 rounded-lg shadow-sm relative transition-colors duration-500 ${isPast ? 'bg-stone-200 text-stone-500' : 'bg-black text-white'}`}>
-                                                            <span className="text-sm font-medium tracking-wide">{event.time}</span>
+                                                <div key={event.id} ref={event.id === currentEventId ? activeRef : null} className={`relative transition-all duration-500 ease-in-out pl-28 ${isExpanded ? 'py-2 z-20' : ''} ${isPast ? 'opacity-60 grayscale' : ''}`}>
+                                                    <div className={`absolute left-0 w-24 flex justify-center mt-1 z-10 transition-all duration-500`}>
+                                                        <div className={`px-3 py-1.5 rounded-lg shadow-sm text-sm font-medium tracking-wide transition-all duration-500 ${isPast ? 'bg-stone-200 text-stone-500' : isNow ? 'bg-black text-white scale-110 shadow-md ring-2 ring-black ring-offset-2 ring-offset-stone-50' : activeTheme.accent}`}>
+                                                            {event.time}
                                                         </div>
                                                     </div>
-                                                    <div className={`bg-white rounded-xl border border-stone-200 overflow-hidden transition-all duration-500 ease-in-out ${isExpanded ? 'w-[100%] sm:w-[95%] shadow-xl relative z-20' : 'w-full shadow-sm hover:shadow-md'}`}>
-                                                        <button onClick={() => toggleEvent(event.id)} className="w-full px-6 py-5 text-left flex items-center justify-between bg-white">
-                                                            <div className="flex-1">
+                                                    <div className={`bg-white rounded-xl border overflow-hidden transition-all duration-500 ease-in-out ${isExpanded ? 'shadow-xl relative z-20 border-stone-300' : 'shadow-sm hover:shadow-md border-stone-200'} ${isNow && !isExpanded ? 'happening-now shadow-md' : ''}`}>
+                                                        <button onClick={() => toggleEvent(event.id)} className="w-full px-6 py-5 text-left flex items-center justify-between bg-white outline-none">
+                                                            <div className="flex-1 pr-4">
                                                                 <h3 className="text-xl font-serif text-black mb-2">{event.title}</h3>
                                                                 <div className="flex flex-col gap-2">
-                                                                    <a href={`http://googleusercontent.com/maps.google.com/?q=${encodeURIComponent(event.location)}`} target="_blank" rel="noopener noreferrer" className={`inline-flex items-center gap-1.5 text-sm text-stone-500 font-light hover:text-black transition-colors w-fit`}>
+                                                                    <a href={`http://googleusercontent.com/maps.google.com/?q=${encodeURIComponent(event.location)}`} target="_blank" rel="noopener noreferrer" className={`inline-flex items-center gap-1.5 text-sm text-stone-500 font-light hover:${activeTheme.accentText} transition-colors w-fit`} onClick={e => e.stopPropagation()}>
                                                                         <Icons.MapPin className="w-3.5 h-3.5" />
                                                                         <span className="underline underline-offset-2">{event.location}</span>
                                                                     </a>
@@ -749,17 +668,17 @@
                                                                     )}
                                                                 </div>
                                                             </div>
-                                                            {isExpanded ? <Icons.ChevronUp className="w-5 h-5 text-stone-400" /> : <Icons.ChevronDown className="w-5 h-5 text-stone-400" />}
+                                                            {isExpanded ? <Icons.ChevronUp className="w-5 h-5 text-stone-400 shrink-0" /> : <Icons.ChevronDown className="w-5 h-5 text-stone-400 shrink-0" />}
                                                         </button>
                                                         <div className={`transition-all duration-500 ease-in-out overflow-hidden ${isExpanded ? 'max-h-[3000px] opacity-100' : 'max-h-0 opacity-0'}`}>
                                                             <div className="px-6 pb-6 border-t border-stone-100">
                                                                 {renderDescriptionContent(event.description)}
-                                                                <div className="mt-5 flex flex-wrap gap-2">{event.teams.map(team => (<span key={team} className={`px-3 py-1 bg-stone-100 text-stone-600 text-xs rounded-full border border-stone-200`}>{CONFIG.filters.find(f => f.id === team)?.label || team}</span>))}</div>
+                                                                <div className="mt-5 flex flex-wrap gap-2">{event.teams.map(team => (<span key={team} className={`px-3 py-1 ${activeTheme.light} text-stone-600 text-xs rounded-full border ${activeTheme.border}`}>{CONFIG.filters.find(f => f.id === team)?.label || team}</span>))}</div>
                                                                 {event.image && <img src={event.image} alt={event.title} className="mt-4 rounded-xl w-full border border-stone-100" />}
                                                                 {event.links && event.links.length > 0 && (
                                                                     <div className="mt-4 space-y-2">
                                                                         {event.links.map((link, idx) => (
-                                                                            <a key={idx} href={link.url} target="_blank" rel="noopener noreferrer" className={`inline-flex items-center gap-2 text-black text-sm underline-offset-4 hover:underline transition-colors`}><Icons.ExternalLink className="w-4 h-4" />{link.text}</a>
+                                                                            <a key={idx} href={link.url} target="_blank" rel="noopener noreferrer" className={`inline-flex items-center gap-2 ${activeTheme.accentText} text-sm underline-offset-4 hover:underline transition-colors`}><Icons.ExternalLink className="w-4 h-4" />{link.text}</a>
                                                                         ))}
                                                                     </div>
                                                                 )}
@@ -773,7 +692,7 @@
                                 </div>
                             </div>
 
-                            <footer className="mt-8 border-t border-stone-200">
+                            <footer className="mt-auto border-t border-stone-200">
                                 <div className="max-w-4xl mx-auto px-4 py-12 text-center">
                                     <Icons.Heart className={`w-6 h-6 mx-auto mb-4 text-stone-300`} fillClass="fill-stone-100" />
                                     <p className="text-stone-600 font-light text-sm">{CONFIG.footerMessage}</p>
@@ -782,52 +701,66 @@
                             </footer>
                         </div>
 
-                        {/* --- VIEW 3: VENDOR LIST (RIGHT) --- */}
+                        {/* --- VIEW 3: VENDORS & CONTACTS (RIGHT) --- */}
                         <div className={`${panelWidth} shrink-0 min-h-screen relative bg-stone-50`}>
-                            
-                            {/* Vendor Swipe Header */}
-                            <div 
-                                className={`bg-white/95 backdrop-blur border-b border-stone-200 sticky top-0 z-50`}
-                                onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd}
-                            >
+                            <div className="bg-white/95 backdrop-blur border-b border-stone-200 sticky top-0 z-50" onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd}>
                                 <div className="w-full flex justify-center pt-3 md:hidden"><div className="w-12 h-1.5 bg-stone-200 rounded-full"></div></div>
                                 <div className="max-w-3xl mx-auto px-6 py-6 pt-4 text-center select-none relative">
                                     <button onClick={() => setView('timeline')} className="absolute left-6 top-5 p-2 text-stone-400 hover:text-black md:hidden">
                                         <Icons.ArrowLeft className="w-6 h-6" />
                                     </button>
-                                    <h2 className="text-3xl font-serif text-black mb-1">Vendor Directory</h2>
+                                    <h2 className="text-3xl font-serif text-black mb-1">Directory</h2>
                                     <p className="text-stone-500 text-sm font-light">Key contacts for the big day.</p>
                                 </div>
                             </div>
 
-                            <div className="max-w-3xl mx-auto px-4 py-8">
+                            <div className="max-w-3xl mx-auto px-4 py-8 space-y-8">
+                                {/* Bridal Party Box */}
                                 <div className="bg-white rounded-2xl shadow-sm border border-stone-200 overflow-hidden">
+                                    <div className={`px-6 py-5 border-b border-stone-200 bg-stone-100`}>
+                                        <h2 className="text-xl font-serif text-black">Bridal Party</h2>
+                                    </div>
+                                    <div className="divide-y divide-stone-100">
+                                        {bridalParty.map((person, idx) => (
+                                            <div key={idx} className="p-5 flex items-center justify-between hover:bg-stone-50 transition-colors">
+                                                <div>
+                                                    <p className="text-xs font-bold uppercase tracking-widest text-stone-400 mb-1">{person.role}</p>
+                                                    <h3 className="text-base font-medium text-black">{person.name}</h3>
+                                                </div>
+                                                <a href={`tel:${person.contact}`} className={`flex items-center justify-center gap-2 bg-stone-800 text-white w-10 h-10 rounded-full hover:bg-black transition-colors`}><Icons.Phone className="w-4 h-4" /></a>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* Vendors Box */}
+                                <div className="bg-white rounded-2xl shadow-sm border border-stone-200 overflow-hidden">
+                                    <div className={`px-6 py-5 border-b border-stone-200 bg-stone-100`}>
+                                        <h2 className="text-xl font-serif text-black">Vendors</h2>
+                                    </div>
                                     <div className="divide-y divide-stone-100">
                                         {vendors.map((vendor, idx) => (
-                                            <div key={idx} className="p-6 flex flex-col sm:flex-row gap-4 sm:items-center justify-between hover:bg-stone-50 transition-colors">
+                                            <div key={idx} className="p-5 flex flex-col sm:flex-row gap-4 sm:items-center justify-between hover:bg-stone-50 transition-colors">
                                                 <div>
                                                     <p className="text-xs font-bold uppercase tracking-widest text-stone-400 mb-1">{vendor.role}</p>
-                                                    <h3 className="text-lg font-serif text-black">{vendor.name}</h3>
+                                                    <h3 className="text-base font-medium text-black">{vendor.name}</h3>
                                                 </div>
                                                 <div className="flex gap-2">
                                                     {vendor.email && (
-                                                        <a href={`mailto:${vendor.email}`} className={`flex items-center justify-center gap-2 border border-stone-200 text-stone-600 w-10 h-10 rounded-full hover:bg-stone-100 transition-colors`}>
-                                                            <Icons.Mail className="w-4 h-4" />
-                                                        </a>
+                                                        <a href={`mailto:${vendor.email}`} className={`flex items-center justify-center gap-2 border border-stone-200 text-stone-600 w-10 h-10 rounded-full hover:bg-stone-100 transition-colors`}><Icons.Mail className="w-4 h-4" /></a>
                                                     )}
                                                     {vendor.contact && vendor.contact !== 'TBA' ? (
-                                                        <a href={`tel:${vendor.contact}`} className={`flex items-center gap-2 bg-black text-white px-4 py-2 h-10 rounded-full text-sm font-medium transition-opacity hover:opacity-80`}>
-                                                            <Icons.Phone className="w-4 h-4" /><span>Call</span>
-                                                        </a>
+                                                        <a href={`tel:${vendor.contact}`} className={`flex items-center gap-2 bg-stone-800 text-white px-4 h-10 rounded-full text-sm font-medium hover:bg-black transition-colors`}><Icons.Phone className="w-4 h-4" /><span>Call</span></a>
                                                     ) : (
-                                                        <span className="text-xs text-stone-400 font-mono bg-stone-100 px-3 py-2 h-10 rounded-full flex items-center">TBA</span>
+                                                        <span className="text-xs text-stone-400 font-mono bg-stone-100 px-3 h-10 rounded-full flex items-center">TBA</span>
                                                     )}
                                                 </div>
                                             </div>
                                         ))}
                                     </div>
                                 </div>
-                                <div className="mt-12 text-center pb-12"><button onClick={() => setView('timeline')} className="text-stone-500 hover:text-black text-sm flex items-center justify-center gap-2 mx-auto transition-colors"><Icons.ArrowLeft className="w-4 h-4" />Back to Timeline</button></div>
+
+                                <div className="text-center pb-12"><button onClick={() => setView('timeline')} className="text-stone-500 hover:text-black text-sm flex items-center justify-center gap-2 mx-auto transition-colors"><Icons.ArrowLeft className="w-4 h-4" />Back to Timeline</button></div>
                             </div>
                         </div>
 
@@ -836,34 +769,39 @@
             );
         };
 
-        // --- AUTH WRAPPER ---
         const App = () => {
             const [isAuthenticated, setIsAuthenticated] = useState(false);
             const [isTransitioning, setIsTransitioning] = useState(false);
 
             useEffect(() => {
-                if (localStorage.getItem('weddingAuth_' + CONFIG.pinCode) === 'true') {
-                    setIsAuthenticated(true);
-                }
+                if (localStorage.getItem('weddingAuth_' + CONFIG.pinCode) === 'true') setIsAuthenticated(true);
             }, []);
 
-            if (!isAuthenticated && !isTransitioning) {
-                return <PinScreen onAccess={() => setIsTransitioning(true)} />;
-            }
+            if (!isAuthenticated && !isTransitioning) return <PinScreen onAccess={() => setIsTransitioning(true)} />;
+            if (isTransitioning) setTimeout(() => setIsAuthenticated(true), 10);
 
-            if (isTransitioning) {
-                setTimeout(() => setIsAuthenticated(true), 10);
-            }
-
-            return (
-                <div className="animate-in fade-in zoom-in-95 duration-1000 ease-out">
-                    <WeddingTimeline />
-                </div>
-            );
+            return <div className="animate-in fade-in zoom-in-95 duration-1000 ease-out"><WeddingTimeline /></div>;
         };
 
         const root = ReactDOM.createRoot(document.getElementById('root'));
         root.render(<App />);
+    </script>
+    
+    <script>
+        if ('serviceWorker' in navigator) {
+            const swCode = `
+                const CACHE = 'wedding-v1';
+                self.addEventListener('install', e => {
+                    e.waitUntil(caches.open(CACHE).then(c => c.addAll([location.href])));
+                    self.skipWaiting();
+                });
+                self.addEventListener('fetch', e => {
+                    e.respondWith(caches.match(e.request).then(res => res || fetch(e.request)));
+                });
+            `;
+            const blob = new Blob([swCode], { type: 'application/javascript' });
+            navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(console.error);
+        }
     </script>
 </body>
 </html>
