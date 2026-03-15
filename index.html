@@ -22,10 +22,10 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     
     <style>
-        body { font-family: 'Inter', sans-serif; overflow-x: hidden; }
+        body { font-family: 'Inter', sans-serif; overflow-x: hidden; background-color: #fafaf9; }
         h1, h2, h3, .font-serif { font-family: 'Playfair Display', serif; }
         ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #d6d3d1; border-radius: 4px; }
         .custom-checkbox:checked + div { background-color: currentColor; border-color: currentColor; }
         .custom-checkbox:checked + div svg { display: block; }
@@ -33,7 +33,7 @@
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         
-        /* Shake animation for incorrect PIN */
+        /* Animations */
         @keyframes shake {
             0%, 100% { transform: translateX(0); }
             20%, 60% { transform: translateX(-5px); }
@@ -42,44 +42,44 @@
         .animate-shake { animation: shake 0.4s ease-in-out; }
     </style>
 </head>
-<body class="bg-stone-50">
+<body>
     <div id="root"></div>
 
     <script type="text/babel">
         const { useState, useEffect, useRef } = React;
 
         // ============================================================================
-        // 🛠️ THE MASTER CONFIGURATION (EDIT THIS SECTION FOR EACH WEDDING)
+        // 🛠️ MASTER CONFIGURATION (EDIT FOR EACH WEDDING)
         // ============================================================================
         const CONFIG = {
             // General Info
             coupleNames: "Bride & Groom",
-            weddingDate: "2026-08-28T00:00:00", // YYYY-MM-DD format for timer
+            weddingDate: "2026-08-28T00:00:00", // YYYY-MM-DD
             displayDate: "August 28, 2026",
             weddingLocation: "Sydney, Australia",
             
-            // Password Protection
+            // Security
             pinCode: "2808",
             
-            // Design (Options: 'classic' (stone/black), 'rose', 'sage', 'ocean')
+            // Design: 'classic' (stone/black), 'rose', 'sage', 'ocean'
             theme: "classic", 
             
-            // Features
+            // Map Feature
             enableMapScreen: false, 
             mapImageURL: "https://via.placeholder.com/800x1200?text=Map+Placeholder",
             
-            // Footer text
+            // Footer
             footerMessage: "We can't wait to celebrate with you!",
             footerSignoff: "Best wishes • The Bride & Groom",
 
-            // Helpful Links Hub (Info button)
+            // Info Hub Links
             helpfulLinks: [
-                { title: "Venue Website & Directions", url: "https://maps.google.com" },
-                { title: "Accommodation Details", url: "#" },
+                { title: "Venue Directions", url: "#" },
+                { title: "Accommodation Blocks", url: "#" },
                 { title: "Digital Guestbook", url: "#" }
             ],
 
-            // Custom Filters (id matches 'teams' in events array)
+            // Custom Filters
             filters: [
                 { id: 'all', label: 'Everyone' },
                 { id: 'bride', label: 'Bride' },
@@ -87,7 +87,33 @@
                 { id: 'bridesmaids', label: 'Bridesmaids' },
                 { id: 'groomsmen', label: 'Groomsmen' },
                 { id: 'parents', label: 'Parents' }
-            ]
+            ],
+
+            // Roles Checklists (Tied to Filter IDs)
+            checklists: {
+                bride: {
+                    type: 'message', title: 'Dearest Bride',
+                    lines: [
+                        'Take a deep breath.',
+                        'Today is going to be the best day of your life.',
+                        'Be present in every moment. Soak it all in. Look at the people who love you.',
+                        'Don\'t sweat the small stuff, everything is exactly as it should be.'
+                    ],
+                    signoff: 'Enjoy every second'
+                },
+                groom: {
+                    type: 'checklist', title: 'Groom',
+                    items: ['Suit Jacket & Trousers', 'White Dress Shirt', 'Tie / Bow Tie', 'Shoes & Socks', 'Rings', 'Vows', 'Deodorant / Cologne']
+                },
+                bridesmaids: {
+                    type: 'checklist', title: 'Bridesmaids',
+                    items: ['Dresses Steamed', 'Jewelry On', 'Emergency Kit Packed', 'Speech Ready', 'Keep Bride Hydrated', 'Bags Packed for Venue']
+                },
+                groomsmen: {
+                    type: 'checklist', title: 'Groomsmen',
+                    items: ['Suits On & Lint Rolled', 'Boutonnières Pinned', 'Rings Secured (Best Man)', 'Transport Checked', 'Hype the Groom']
+                }
+            }
         };
 
         // Vendor Directory
@@ -102,272 +128,98 @@
             { role: 'Celebrant', name: 'Wedding Celebrant', contact: 'TBA', email: '' }
         ];
 
-        // The Full Timeline 
+        // The Full Timeline (Demo Content)
         const events = [
             {
-                id: 1, time: '6:30 AM', title: 'Wake Up & Get Ready!',
-                location: 'Getting Ready Location', responsible: ['Bride', 'Groom'], teams: ['all'],
+                id: 1, time: '6:30 AM', title: 'Wake Up & Get Ready!', location: 'Hotel Suites', responsible: ['Bride', 'Groom'], teams: ['all'],
                 description: 'Everyone wakes up. Time to brush teeth and get the day started!',
                 links: [{ text: "Google Drive Quick Links", url: "#" }]
             },
             {
-                id: 2, time: '7:00 AM', title: 'Hair and Make Up Start',
-                location: 'Bridal Suite', responsible: ['Bride'], teams: ['bridesmaids'],
+                id: 2, time: '7:00 AM', title: 'Hair and Make Up Start', location: 'Bridal Suite', responsible: ['Bride'], teams: ['bridesmaids'],
                 description: [
                     { type: 'paragraph', text: 'Makeup Artists arrive. Please have clean faces!' },
-                    { type: 'list', items: [
-                        '7:00am: Bridesmaid 1 - Hair',
-                        '7:00am: Maid of Honor - Makeup',
-                        '7:30am: Bridesmaid 2 - Hair',
-                        '7:45am: Bridesmaid 1 - Makeup'
-                    ]}
+                    { type: 'list', items: ['7:00am: Bridesmaid 1 - Hair', '7:00am: Maid of Honor - Makeup', '7:30am: Bridesmaid 2 - Hair', '7:45am: Bridesmaid 1 - Makeup'] }
                 ], links: []
             },
             {
-                id: 3, time: '8:00 AM', title: 'Hair and Make Up - Part 2',
-                location: 'Bridal Suite', responsible: ['Bride'], teams: ['bridesmaids'],
-                description: [
-                    '8:00am: Maid of Honor - Hair',
-                    '8:30am: Bridesmaid 3 - Hair',
-                    '8:30am: Bridesmaid 2 - Makeup'
-                ], links: []
+                id: 3, time: '9:00 AM', title: 'Breakfast Setup & Decor', location: 'Hotel Lobby', responsible: ['Best Man', 'Bridesmaid 2'], teams: ['bridesmaids', 'groomsmen'],
+                description: ['Start helping with Breakfast setup', 'Bridesmaids start steaming dresses + veil'], links: []
             },
             {
-                id: 4, time: '8:30 AM', title: 'Breakfast Setup & Decor',
-                location: 'Getting Ready Location', responsible: ['Best Man', 'Bridesmaid 2'], teams: ['bridesmaids', 'groomsmen'],
-                description: [
-                    'Start helping with Breakfast setup',
-                    'Start helping with Morning Ceremony setup',
-                    'Bridesmaids start steaming dresses + veil'
-                ], links: []
-            },
-            {
-                id: 5, time: '9:00 AM', title: 'Hair and Make Up - Mums',
-                location: 'Bridal Suite', responsible: ['Bride'], teams: ['bridesmaids', 'parents'],
-                description: [
-                    '9:00am: Mum 1 - Hair',
-                    '9:15am: Bridesmaid 3 - Makeup',
-                    '9:30am: Mum 2 - Hair',
-                    'Bridesmaids start steaming dresses'
-                ], links: []
-            },
-            {
-                id: 6, time: '9:30 AM', title: 'Groomsmen to begin getting ready & packing',
-                location: 'Groom Suite', responsible: ['Best Man'], teams: ['bridesmaids', 'groomsmen'],
+                id: 4, time: '9:30 AM', title: 'Groomsmen Packing', location: 'Groom Suite', responsible: ['Best Man'], teams: ['groomsmen'],
                 description: [
                     { type: 'paragraph', text: 'Groomsmen need to be fully packed and ready to go. The shuttle waits for no one!' },
-                    { type: 'checklist', items: [
-                        'Suit & Tie on',
-                        'Bags packed for Venue',
-                        'Outfit changes',
-                        'Rings',
-                        'Vows'
-                    ]},
-                    { type: 'paragraph', text: 'Once you are ready, help move luggage to the front door.' }
+                    { type: 'checklist', items: ['Suit & Tie on', 'Bags packed for Venue', 'Rings', 'Vows'] },
                 ], links: []
             },
             {
-                id: 7, time: '10:00 AM', title: 'The Bride + Mums Hair & Make Up',
-                location: 'Bridal Suite', responsible: ['Bride'], teams: ['bride', 'parents'],
-                description: [
-                    '10:00am: Bride - Hair & Makeup',
-                    '10:00am: Mum 2 - Makeup',
-                    '10:45am: Mum 1 - Makeup',
-                    'Bridesmaids start steaming dresses and getting ready'
-                ], links: []
+                id: 5, time: '11:00 AM', title: 'Everyone is dressed!', location: 'Hotel Suites', responsible: ['Bride', 'Groom'], teams: ['all'],
+                description: ['Bridesmaids are dressed', 'Groomsmen to get dressed', 'Parents are dressed'], links: []
             },
             {
-                id: 8, time: '10:30 AM', title: 'Have you eaten?',
-                location: 'Getting Ready Location', responsible: ['All Parties'], teams: ['all'],
-                description: 'Make sure people have eaten and drank water. Some may start getting ready during this time',
-                links: []
+                id: 6, time: '11:30 AM', title: 'Photography Arrives', location: 'Hotel Suites', responsible: ['Maid of Honor'], teams: ['all'],
+                description: [{ type: 'list', items: ['11:30am: Photographer & Videographer arrive'] }], links: []
             },
             {
-                id: 9, time: '11:00 AM', title: 'Everyone is dressed!',
-                location: 'Getting Ready Location', responsible: ['Bride', 'Groom'], teams: ['all'],
-                description: [
-                    'Bridesmaids are dressed',
-                    'Groomsmen to get dressed',
-                    'Parents are dressed',
-                    'Bride and Groom are ready for Morning Ceremony',
-                    'Bride and Groom family start to arrive at 11:30am',
-                    'Bridesmaids to finalise steaming dresses and veil'
-                ], links: []
-            },
-            {
-                id: 10, time: '11:30 AM', title: 'Photography & Videography Arrives & Setup',
-                location: 'Getting Ready Location', responsible: ['Maid of Honor', 'Bridesmaid 2', 'Bridesmaid 3'], teams: ['all'],
-                description: [
-                    { type: 'list', items: [
-                        '11:30am: Photographer & Videographer arrive',
-                        'Finalise Morning decoration setup',
-                        'Family ensure ceremony items are ready'
-                    ]},
-                    { type: 'checklist', items: ['Ceremony Items', 'Ingredients', 'Cushion', 'Space Setup'] }
-                ], links: []
-            },
-            {
-                id: 11, time: '12:00 PM', title: 'Morning Ceremony Start!',
-                location: 'Getting Ready Location', responsible: ['Bridesmaid 2'], teams: ['all'],
-                description: [
-                    'Doors Open: Bridal team to open door',
-                    '12:15pm - 1:30pm: Morning Ceremony',
-                    'Bride\'s family served first',
-                    'Groom\'s family to serve next.'
-                ], links: []
-            },
-            {
-                id: 12, time: '1:30 PM', title: 'Final Pack Down & Transport',
-                location: 'Transport to Venue', responsible: ['Best Man', 'Groomsman 1'], teams: ['all'],
+                id: 7, time: '1:30 PM', title: 'Transport to Venue', location: 'Transport', responsible: ['Best Man'], teams: ['all'],
                 description: [
                     { type: 'paragraph', text: 'Shuttle arrives at 1:30pm sharp. We depart at 1:45pm. Ensure all items needed are packed. No time to go back!' },
-                    { type: 'checklist', items: [
-                        'Rings', 'Vows', 'Dress Changes', 'Speech Scripts',
-                        'Bags needed for Reception & Ceremony', 'Bridal Kit', 'Phone Chargers', 'Water/Drinks'
-                    ]}
+                    { type: 'checklist', items: ['Rings', 'Vows', 'Dress Changes', 'Speech Scripts', 'Bridal Kit'] }
                 ], links: []
             },
             {
-                id: 13, time: '2:00 PM', title: 'Reception Preparation + Rehearsal',
-                location: 'Venue', responsible: ['Bride', 'Groom'], teams: ['all'],
-                description: '2:15pm - 3:30pm: Reception preparation and dry run of the ceremony.',
-                links: []
+                id: 8, time: '2:00 PM', title: 'Reception Preparation', location: 'Venue', responsible: ['Bride', 'Groom'], teams: ['all'],
+                description: '2:15pm - 3:30pm: Reception preparation and dry run of the ceremony.', links: []
             },
             {
-                id: 14, time: '3:30 PM', title: 'Guest Transport & Reception + Ceremony Setup',
-                location: 'Hotel / Venue', responsible: ['Bride', 'Bridesmaid 2', 'Groomsman 1', 'Maid of Honor', 'Best Man'], teams: ['bride', 'bridesmaids', 'groomsmen', 'groom'],
+                id: 9, time: '4:00 PM', title: 'First Look & Guests Arrive', location: 'Venue Grounds', responsible: ['Bride', 'Groom'], teams: ['bride', 'groom'],
                 description: [
-                    { type: 'paragraph', text: '3:30pm: Shuttle picks up guests from Hotel.' },
-                    { type: 'paragraph', text: 'Styling setup continues (Floral, Wishing Well).' },
-                    { type: 'checklist', items: [
-                        'Table Flowers', 'Wishing well + Guest Book table', 'Table Menus',
-                        'Personal notes + place cards', 'Lamps/Candles for each table', 'Photo Booth Props'
-                    ]},
-                    { type: 'paragraph', text: 'Ceremony area set up - flower arrangements' },
-                    { type: 'paragraph', text: 'Bride to change into wedding dress, final touch ups' }
+                    { type: 'paragraph', text: '4:00pm: Bride and Groom meet for first look.' },
+                    { type: 'paragraph', text: '4:00pm: Guests arrive and are seated.' }
                 ], links: []
             },
             {
-                id: 15, time: '4:00 PM', title: 'First Look + Guest start to arrive',
-                location: 'Venue Grounds', responsible: ['Bride', 'Groom'], teams: ['bride', 'groom'],
-                description: [
-                    { type: 'paragraph', text: '4:00pm: Bride and Groom meet for first look with Maid of Honor and Best Man' },
-                    { type: 'paragraph', text: '4:00pm: Guests arrive and are seated. Rest of bridal party to mingle. Water is served to guests before ceremony start.' }
-                ], links: []
-            },
-            {
-                id: 16, time: '4:30 PM', title: 'Wedding Ceremony',
-                location: 'Ceremony Location', responsible: ['MC / Coordinator'], teams: ['all'],
+                id: 10, time: '4:30 PM', title: 'Wedding Ceremony', location: 'Ceremony Location', responsible: ['MC'], teams: ['all'],
                 description: [
                     { type: 'paragraph', text: 'The Ceremony will begin!' },
-                    { type: 'paragraph', text: 'Entrance Order - Officiant, Groomsmen, Bridesmaids, Bride + Escort' },
                     { type: 'paragraph', text: 'Group Photo Priority List:' },
-                    { type: 'checklist', items: [
-                        'Immediate family (Partner 1)',
-                        'Immediate family (Partner 2)',
-                        'Extended family',
-                        'Bridal Party (ALL)',
-                        'Bridal Party (Bridesmaids)',
-                        'Bridal Party (Groomsmen)',
-                        'School/Uni friends',
-                        'Family friends'
-                    ]}
+                    { type: 'checklist', items: ['Immediate family', 'Extended family', 'Bridal Party (ALL)', 'Friends'] }
                 ], links: []
             },
             {
-                id: 17, time: '5:00 PM', title: 'Vendors Arrive (DJ/Photobooth)',
-                location: 'Reception Hall', responsible: ['MC / Coordinator'], teams: ['all'],
-                description: ['Vendors set up at the Reception Hall'], links: []
+                id: 11, time: '5:30 PM', title: 'Cocktail Hour', location: 'Venue Grounds', responsible: ['MC'], teams: ['all'],
+                description: ['5:30pm - 6:15pm: Drinks, mingling, and bridal party photos', '6:15pm: Door opens to Hall'], links: []
             },
             {
-                id: 18, time: '5:30 PM', title: 'Aperitivo (Cocktail Hour)',
-                location: 'Venue Grounds', responsible: ['MC / Coordinator'], teams: ['all'],
+                id: 12, time: '6:30 PM', title: 'Wedding Reception Starts!', location: 'Reception Hall', responsible: ['MC'], teams: ['all'],
                 description: [
-                    'MC to ensure photos are done before heading to food/drinks.',
-                    '5:30pm - 6:15pm: Drinks, mingling, and bridal party photos',
-                    '5:45pm: Table set up ready at the hall - Photographers to do styling shots before guest arrive/enter.',
-                    '6:15pm: Door opens'
-                ], links: []
-            },
-            {
-                id: 19, time: '6:00 PM', title: 'Reception Table Setting Finalised & Doors Open',
-                location: 'Reception Hall', responsible: ['MC', 'Bridesmaid 2'], teams: ['all'],
-                description: [
-                    'Door are open. Ensure photographers have taken photos of the empty hall before people enter.',
-                    'Guest to be seated'
-                ], links: []
-            },
-            {
-                id: 20, time: '6:30 PM', title: 'Wedding Reception Starts!',
-                location: 'Reception Hall', responsible: ['MC'], teams: ['all'],
-                description: [
-                    { type: 'paragraph', text: 'MC to kick off the Reception and get guest seated for the Grand Entrances' },
                     { type: 'paragraph', text: '6:30pm: Grand Entrances! Order: Bridal Party pairs, Bride & Groom' },
-                    { type: 'paragraph', text: '6:40pm: House keeping' },
-                    { type: 'checklist', items: [
-                        'MC Introduction', 'Bathroom Location', 'Menu details', 'Open Bar details',
-                        'Wishing Well / Guest Book', 'Photobooth timing'
-                    ]},
+                    { type: 'checklist', items: ['MC Introduction', 'Bathroom Location', 'Menu details', 'Open Bar', 'Photobooth'] },
                     { type: 'paragraph', text: '6:40pm: Speeches (Parents of the Bride & Groom)' }
                 ], links: []
             },
             {
-                id: 21, time: '7:00 PM', title: 'Dinner & Golden Hour Photos',
-                location: 'Reception Hall', responsible: ['Bride', 'Groom'], teams: ['all'],
-                description: [
-                    '7:00pm: Sides & Mains served',
-                    'Couple golden hour photoshoot'
-                ], links: []
+                id: 13, time: '7:00 PM', title: 'Dinner & Golden Hour Photos', location: 'Reception Hall', responsible: ['Bride', 'Groom'], teams: ['all'],
+                description: ['7:00pm: Sides & Mains served', 'Couple golden hour photoshoot'], links: []
             },
             {
-                id: 22, time: '7:30 PM', title: 'Speeches continue!',
-                location: 'Reception Hall', responsible: ['Maid of Honor', 'Groom', 'Bride', 'Best Man'], teams: ['bride', 'groom', 'bridesmaids', 'groomsmen'],
-                description: [
-                    { type: 'paragraph', text: 'Wait for Bride and Groom to return for Final set of speeches:' },
-                    { type: 'checklist', items: [
-                        'Maid of Honor Speech',
-                        'Best Man Speech',
-                        'Bride and Groom Speech'
-                    ]}
-                ], links: []
-            },
-            {
-                id: 23, time: '8:00 PM', title: 'Dress Change + First Dance',
-                location: 'Reception Hall', responsible: ['Maid of Honor', 'Groom'], teams: ['all'],
-                description: [
-                    '8:15pm: Bride changes dress (if applicable)',
-                    '8:20pm: First Dance, Dessert served, and Dance Floor opens!'
-                ], links: []
-            },
-            {
-                id: 24, time: '8:30 PM', title: 'Dance Floor is Open!',
-                location: 'Reception Hall', responsible: ['Guests', 'DJ'], teams: ['all'],
+                id: 14, time: '8:30 PM', title: 'Dance Floor is Open!', location: 'Reception Hall', responsible: ['Guests', 'DJ'], teams: ['all'],
                 description: ['TIME TO PARTY!'], links: []
             },
             {
-                id: 25, time: '10:30 PM', title: 'Farewell!',
-                location: 'Reception Hall', responsible: ['DJ'], teams: ['all'],
-                description: [
-                    '10:30pm: DJ Announce that Shuttle bus available',
-                    '10:45pm: Party concludes. Pack down begins.'
-                ], links: []
-            },
-            {
-                id: 26, time: '11:00 PM', title: 'Bridal Party returns back to Hotel!',
-                location: 'Hotel', responsible: ['MC', 'Best Man'], teams: ['all'],
-                description: ['Party Over! Bridal Party head to shuttle bus.'], links: []
+                id: 15, time: '10:30 PM', title: 'Farewell!', location: 'Reception Hall', responsible: ['DJ'], teams: ['all'],
+                description: ['10:45pm: Party concludes. Pack down begins.'], links: []
             }
         ];
-        // ============================================================================
-        // END CONFIGURATION
         // ============================================================================
 
         // --- THEME ENGINE ---
         const THEMES = {
-            classic: { bg: 'bg-stone-50', text: 'text-stone-900', light: 'bg-stone-100', border: 'border-stone-200', accent: 'bg-black text-white border-black', accentText: 'text-black', fill: 'fill-stone-200', overlay: 'bg-stone-800' },
-            rose: { bg: 'bg-rose-50', text: 'text-rose-900', light: 'bg-rose-100', border: 'border-rose-200', accent: 'bg-rose-700 text-white border-rose-700', accentText: 'text-rose-700', fill: 'fill-rose-200', overlay: 'bg-rose-900' },
-            sage: { bg: 'bg-emerald-50', text: 'text-emerald-900', light: 'bg-emerald-100', border: 'border-emerald-200', accent: 'bg-emerald-700 text-white border-emerald-700', accentText: 'text-emerald-700', fill: 'fill-emerald-200', overlay: 'bg-emerald-900' },
-            ocean: { bg: 'bg-sky-50', text: 'text-sky-900', light: 'bg-sky-100', border: 'border-sky-200', accent: 'bg-sky-700 text-white border-sky-700', accentText: 'text-sky-700', fill: 'fill-sky-200', overlay: 'bg-sky-900' }
+            classic: { bg: 'bg-stone-50', text: 'text-stone-900', light: 'bg-stone-100', border: 'border-stone-200', accent: 'bg-black text-white border-black', accentText: 'text-black', fill: 'fill-stone-200', overlay: 'bg-stone-900' },
+            rose: { bg: 'bg-rose-50', text: 'text-rose-900', light: 'bg-rose-100', border: 'border-rose-200', accent: 'bg-rose-700 text-white border-rose-700', accentText: 'text-rose-700', fill: 'fill-rose-200', overlay: 'bg-rose-950' },
+            sage: { bg: 'bg-emerald-50', text: 'text-emerald-900', light: 'bg-emerald-100', border: 'border-emerald-200', accent: 'bg-emerald-700 text-white border-emerald-700', accentText: 'text-emerald-700', fill: 'fill-emerald-200', overlay: 'bg-emerald-950' },
+            ocean: { bg: 'bg-sky-50', text: 'text-sky-900', light: 'bg-sky-100', border: 'border-sky-200', accent: 'bg-sky-700 text-white border-sky-700', accentText: 'text-sky-700', fill: 'fill-sky-200', overlay: 'bg-sky-950' }
         };
         const activeTheme = THEMES[CONFIG.theme] || THEMES.classic;
 
@@ -393,49 +245,62 @@
             Lock: ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
         };
 
-        // --- PASSWORD SCREEN ---
+        // --- CUSTOM KEYPAD SCREEN ---
         const PinScreen = ({ onAccess }) => {
             const [pin, setPin] = useState('');
             const [error, setError] = useState(false);
+            const [isUnlocking, setIsUnlocking] = useState(false);
 
-            const handlePinChange = (e) => {
-                const val = e.target.value.replace(/\D/g, '');
-                setPin(val);
-                if (val.length === 4) {
-                    if (val === CONFIG.pinCode) {
-                        localStorage.setItem('weddingAuth_' + CONFIG.pinCode, 'true');
-                        onAccess();
-                    } else {
-                        setError(true);
-                        setTimeout(() => { setPin(''); setError(false); }, 500);
-                    }
+            const handleKeyPress = (num) => {
+                if (pin.length < 4) setPin(prev => prev + num);
+            };
+            
+            const handleClear = () => setPin('');
+            
+            const handleEnter = () => {
+                if (pin === CONFIG.pinCode) {
+                    localStorage.setItem('weddingAuth_' + CONFIG.pinCode, 'true');
+                    setIsUnlocking(true);
+                    setTimeout(() => onAccess(), 600); // Wait for soft fade-out transition
+                } else {
+                    setError(true);
+                    setTimeout(() => { setPin(''); setError(false); }, 400);
                 }
             };
 
             return (
-                <div className={`min-h-screen flex flex-col items-center justify-center px-4 ${activeTheme.bg}`}>
-                    <div className="text-center mb-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
+                <div className={`min-h-screen flex flex-col items-center justify-center px-4 ${activeTheme.bg} transition-all duration-700 ease-in-out ${isUnlocking ? 'opacity-0 scale-110 blur-sm pointer-events-none' : 'opacity-100 scale-100'}`}>
+                    <div className="text-center mb-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
                         <Icons.Lock className={`w-8 h-8 mx-auto mb-6 text-stone-300`} />
                         <h1 className="text-4xl sm:text-5xl font-serif text-black mb-3">{CONFIG.coupleNames}</h1>
                         <p className="text-stone-500 font-light tracking-wide">{CONFIG.displayDate}</p>
                         <p className="text-stone-400 font-light text-sm mt-1">{CONFIG.weddingLocation}</p>
                     </div>
                     
-                    <div className={`transition-transform duration-300 ${error ? 'animate-shake' : ''}`}>
-                        <input 
-                            type="password" 
-                            inputMode="numeric" 
-                            pattern="[0-9]*"
-                            autoFocus
-                            maxLength={4}
-                            value={pin}
-                            onChange={handlePinChange}
-                            className="w-48 text-center text-4xl tracking-[0.5em] p-4 rounded-2xl border-2 border-stone-200 focus:border-stone-400 outline-none bg-white shadow-sm transition-colors font-mono placeholder:text-stone-200 placeholder:-translate-y-1"
-                            placeholder="••••"
-                        />
+                    {/* Pin Dots */}
+                    <div className={`flex justify-center gap-4 mb-8 h-4 transition-transform duration-300 ${error ? 'animate-shake' : ''}`}>
+                        {[0, 1, 2, 3].map(i => (
+                            <div key={i} className={`w-4 h-4 rounded-full border-2 transition-all duration-200 ${pin.length > i ? 'bg-stone-800 border-stone-800 scale-110' : 'border-stone-300 bg-transparent'}`} />
+                        ))}
                     </div>
-                    <div className="h-6 mt-4">
-                        {error && <p className="text-rose-500 text-sm font-medium transition-opacity">Incorrect PIN</p>}
+                    {error && <p className="text-rose-500 text-sm font-medium absolute mt-[-20px] transition-opacity">Incorrect PIN</p>}
+
+                    {/* Custom Keypad */}
+                    <div className="grid grid-cols-3 gap-4 sm:gap-6 max-w-[280px] w-full mx-auto mt-4 animate-in fade-in slide-in-from-bottom-8 duration-700 delay-150">
+                        {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(num => (
+                            <button key={num} onClick={() => handleKeyPress(num)} className="aspect-square rounded-full bg-white shadow-sm text-2xl font-light text-stone-700 active:bg-stone-200 active:scale-95 transition-all hover:shadow-md flex items-center justify-center">
+                                {num}
+                            </button>
+                        ))}
+                        <button onClick={handleClear} className="aspect-square rounded-full text-stone-400 font-medium active:bg-stone-200 active:scale-95 transition-all flex items-center justify-center text-sm uppercase tracking-wider">
+                            Clear
+                        </button>
+                        <button onClick={() => handleKeyPress(0)} className="aspect-square rounded-full bg-white shadow-sm text-2xl font-light text-stone-700 active:bg-stone-200 active:scale-95 transition-all hover:shadow-md flex items-center justify-center">
+                            0
+                        </button>
+                        <button onClick={handleEnter} className={`aspect-square rounded-full ${activeTheme.accent} shadow-md active:opacity-80 active:scale-95 transition-all flex items-center justify-center`}>
+                            <Icons.ArrowRight className="w-8 h-8" />
+                        </button>
                     </div>
                 </div>
             );
@@ -461,35 +326,38 @@
             </div>
         );
 
-        const EasterEggMessage = ({ onClose }) => (
+        const MessageModal = ({ data, onClose }) => (
             <div className={`fixed inset-0 ${activeTheme.bg} z-[100] overflow-hidden animate-in fade-in duration-700 flex flex-col items-center justify-center p-8 text-center`}>
                 <button onClick={onClose} className={`absolute top-8 right-8 p-3 ${activeTheme.light} rounded-full transition-colors`}>
-                    <Icons.X className="w-6 h-6" />
+                    <Icons.X className="w-6 h-6 text-stone-600" />
                 </button>
                 <div className="max-w-lg space-y-8 animate-in slide-in-from-bottom-8 duration-1000 delay-150">
                     <div className="flex justify-center mb-6">
                         <div className={`p-4 ${activeTheme.light} rounded-full`}><Icons.Heart className={`w-16 h-16 ${activeTheme.accentText}`} fillClass={activeTheme.fill} /></div>
                     </div>
-                    <h2 className="text-4xl font-serif mb-4 tracking-wide">Take a deep breath.</h2>
-                    <div className="space-y-6 font-light text-lg leading-relaxed">
-                        <p>Today is going to be the <span className="font-medium">best day of your lives</span>.</p>
-                        <p>Be present in every moment. Soak it all in. Look at the people who love you.</p>
-                        <p>Don't sweat the small stuff, everything is exactly as it should be.</p>
+                    <h2 className="text-4xl font-serif mb-4 tracking-wide text-stone-900">{data.title}</h2>
+                    <div className="space-y-6 font-light text-lg leading-relaxed text-stone-700">
+                        {data.lines.map((line, i) => (
+                            <p key={i} className={i === 0 ? "text-2xl font-serif italic text-stone-900" : ""}>{line}</p>
+                        ))}
                     </div>
-                    <div className="pt-12"><p className={`${activeTheme.accentText} text-xs font-mono uppercase tracking-[0.3em]`}>Enjoy every second</p></div>
+                    <div className="pt-12"><p className={`${activeTheme.accentText} text-xs font-mono uppercase tracking-[0.3em]`}>{data.signoff}</p></div>
                 </div>
             </div>
         );
 
-        const GenericChecklist = ({ title, itemsData, onClose }) => {
-            const [items, setItems] = useState(itemsData);
+        const ChecklistModal = ({ data, onClose }) => {
+            const initialItems = data.items.map((item, idx) => ({ id: idx, text: item, checked: false }));
+            const [items, setItems] = useState(initialItems);
+            
             const toggleItem = (id) => setItems(items.map(item => item.id === id ? { ...item, checked: !item.checked } : item));
             const progress = Math.round((items.filter(i => i.checked).length / items.length) * 100);
+            
             return (
                 <div className={`fixed inset-0 ${activeTheme.overlay} text-white z-[100] overflow-y-auto animate-in fade-in duration-300`}>
                     <div className="max-w-2xl mx-auto p-8">
                         <div className="flex justify-between items-start mb-4">
-                            <div><h2 className="text-4xl font-serif mb-2 text-white">{title}</h2><p className="text-white/50 font-mono text-sm tracking-widest uppercase">Protocol</p></div>
+                            <div><h2 className="text-4xl font-serif mb-2 text-white">{data.title}</h2><p className="text-white/50 font-mono text-sm tracking-widest uppercase">Protocol</p></div>
                             <button onClick={onClose} className="p-2 bg-white/10 rounded-full hover:bg-white/20 transition-colors"><Icons.X className="w-6 h-6 text-white" /></button>
                         </div>
                         <div className={`sticky top-0 z-30 ${activeTheme.overlay} pb-8 pt-4 mb-4 border-b border-white/10`}>
@@ -504,7 +372,7 @@
                                 <label key={item.id} className="group flex items-center p-4 bg-white/5 border border-white/10 rounded-xl cursor-pointer hover:bg-white/10 transition-all">
                                     <input type="checkbox" className="hidden custom-checkbox text-white" checked={item.checked} onChange={() => toggleItem(item.id)} />
                                     <div className={`w-6 h-6 border-2 border-white/30 rounded-md flex items-center justify-center mr-4 transition-colors group-hover:border-white/50 ${item.checked ? 'bg-white border-white' : ''}`}>
-                                        <Icons.Check className={`w-4 h-4 ${activeTheme.accentText} ${item.checked ? 'block' : 'hidden'}`} />
+                                        <Icons.Check className={`w-4 h-4 text-black ${item.checked ? 'block' : 'hidden'}`} />
                                     </div>
                                     <span className={`text-lg font-light tracking-wide transition-opacity ${item.checked ? 'opacity-30 line-through' : 'opacity-100'}`}>{item.text}</span>
                                 </label>
@@ -526,16 +394,11 @@
             
             const [showFilters, setShowFilters] = useState(false);
             const [showLinks, setShowLinks] = useState(false);
+            const [activeChecklist, setActiveChecklist] = useState(null); // Holds the ID of the open checklist
             
             // View Navigation
             const [view, setView] = useState('timeline'); // 'map', 'timeline', 'vendors'
             const [mapZoom, setMapZoom] = useState(false);
-
-            // Easter Egg States
-            const [clickCount1, setClickCount1] = useState(0);
-            const [clickCount2, setClickCount2] = useState(0);
-            const [showEggMessage, setShowEggMessage] = useState(false);
-            const [showEggList, setShowEggList] = useState(false);
 
             const activeRef = useRef(null); 
             const weddingDate = new Date(CONFIG.weddingDate);
@@ -569,7 +432,7 @@
                 return () => clearInterval(timer);
             }, []);
 
-            // Gesture Swiping Logic (RESTRICTED TO BANNER ONLY via handlers on the header)
+            // Gesture Swiping Logic (RESTRICTED TO BANNER ONLY)
             const [touchStart, setTouchStart] = useState(null);
             const [touchEnd, setTouchEnd] = useState(null);
             const minSwipeDistance = 50;
@@ -641,19 +504,6 @@
             const firstActiveIndex = filteredEvents.findIndex(event => !(isWeddingDay && parseEventTime(event.time) < currentMinutes - 30));
 
             const toggleFilter = (filterId) => {
-                // Generic Easter Eggs triggering
-                if (filterId === CONFIG.filters[1]?.id) {
-                    setClickCount2(0); const newCount = clickCount1 + 1; setClickCount1(newCount);
-                    if (newCount >= 3) { setShowEggMessage(true); setClickCount1(0); }
-                } else if (filterId === CONFIG.filters[3]?.id || filterId === 'bridesmaids') {
-                    setClickCount1(0); const newCount = clickCount2 + 1; setClickCount2(newCount);
-                    if (newCount >= 4) { 
-                        setShowEggList(true); setClickCount2(0); 
-                    }
-                } else {
-                    setClickCount1(0); setClickCount2(0);
-                }
-
                 if (filterId === 'all') { setSelectedFilters(['all']); } 
                 else {
                     setSelectedFilters(prev => {
@@ -675,8 +525,14 @@
 
             return (
                 <div className={`overflow-x-hidden w-full relative min-h-screen ${activeTheme.bg}`}>
-                    {showEggList && <GenericChecklist title="Essentials" itemsData={[{id:1, text:"Attire Ready", checked:false}, {id:2, text:"Rings/Vows", checked:false}, {id:3, text:"Deodorant/Perfume", checked:false}, {id:4, text:"Phone Charger", checked:false}, {id:5, text:"Have Fun!", checked:false}]} onClose={() => setShowEggList(false)} />}
-                    {showEggMessage && <EasterEggMessage onClose={() => setShowEggMessage(false)} />}
+                    {/* DYNAMIC CHECKLIST MODALS */}
+                    {activeChecklist && CONFIG.checklists[activeChecklist]?.type === 'checklist' && (
+                        <ChecklistModal data={CONFIG.checklists[activeChecklist]} onClose={() => setActiveChecklist(null)} />
+                    )}
+                    {activeChecklist && CONFIG.checklists[activeChecklist]?.type === 'message' && (
+                        <MessageModal data={CONFIG.checklists[activeChecklist]} onClose={() => setActiveChecklist(null)} />
+                    )}
+                    
                     {showLinks && <HelpfulLinksModal onClose={() => setShowLinks(false)} />}
 
                     {/* --- DESKTOP NAVIGATION ARROWS --- */}
@@ -708,9 +564,9 @@
                         {/* --- VIEW 2: TIMELINE (CENTER) --- */}
                         <div className={`${panelWidth} shrink-0 relative z-20 min-h-screen ${activeTheme.bg}`}>
                             
-                            {/* Header (SWIPE LISTENER ADDED HERE) */}
+                            {/* Header (SWIPE LISTENER RESTRICTED TO THIS BOX ONLY) */}
                             <header 
-                                className={`bg-white border-b border-stone-200 sticky top-0 z-50 shadow-sm`}
+                                className="bg-white border-b border-stone-200 sticky top-0 z-50 shadow-sm"
                                 onTouchStart={onTouchStart}
                                 onTouchMove={onTouchMove}
                                 onTouchEnd={onTouchEnd}
@@ -723,7 +579,7 @@
                                 <div className="max-w-4xl mx-auto px-4 py-6 pb-6 pt-4 text-center select-none">
                                     <h1 className="text-4xl font-serif text-black mb-2">{CONFIG.coupleNames}</h1>
                                     <p className="text-stone-600 font-light tracking-wide">{CONFIG.displayDate}</p>
-                                    <p className="text-stone-500 font-light text-sm mt-1">{CONFIG.weddingLocation}</p>
+                                    <p className="text-stone-400 font-light text-sm mt-1">{CONFIG.weddingLocation}</p>
                                     
                                     {countdown.days > 0 || countdown.hours > 0 || countdown.minutes > 0 ? (
                                         <div className="mt-4 flex items-center justify-center gap-4">
@@ -776,6 +632,18 @@
                                             </div>
                                         </div>
                                     )}
+
+                                    {/* DYNAMIC CHECKLIST BUTTON (Appears when a filter with a checklist is active) */}
+                                    {selectedFilters.length === 1 && selectedFilters[0] !== 'all' && CONFIG.checklists[selectedFilters[0]] && (
+                                        <div className="pb-4 animate-in slide-in-from-top-2">
+                                            <button 
+                                                onClick={() => setActiveChecklist(selectedFilters[0])}
+                                                className={`w-full py-3 ${activeTheme.light} border ${activeTheme.border} ${activeTheme.accentText} rounded-xl shadow-sm hover:bg-stone-50 transition-colors font-medium text-sm flex items-center justify-center gap-2`}
+                                            >
+                                                <Icons.Check className="w-4 h-4" /> View {CONFIG.filters.find(f => f.id === selectedFilters[0]).label} Protocol
+                                            </button>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
 
@@ -801,7 +669,7 @@
                                                             <div className="flex-1">
                                                                 <h3 className="text-xl font-serif text-black mb-2">{event.title}</h3>
                                                                 <div className="flex flex-col gap-2">
-                                                                    <a href={`https://maps.google.com/?q=${encodeURIComponent(event.location)}`} target="_blank" rel="noopener noreferrer" className={`inline-flex items-center gap-1.5 text-sm text-stone-500 font-light hover:${activeTheme.accentText} transition-colors w-fit`}>
+                                                                    <a href={`http://googleusercontent.com/maps.google.com/?q=${encodeURIComponent(event.location)}`} target="_blank" rel="noopener noreferrer" className={`inline-flex items-center gap-1.5 text-sm text-stone-500 font-light hover:${activeTheme.accentText} transition-colors w-fit`}>
                                                                         <Icons.MapPin className="w-3.5 h-3.5" />
                                                                         <span className="underline underline-offset-2">{event.location}</span>
                                                                     </a>
@@ -847,7 +715,7 @@
                         </div>
 
                         {/* --- VIEW 3: VENDOR LIST (RIGHT) --- */}
-                        <div className={`${panelWidth} shrink-0 min-h-screen relative ${activeTheme.bg}`}>
+                        <div className={`${panelWidth} shrink-0 relative ${activeTheme.bg}`}>
                             <div className="absolute top-6 left-6 z-10"><button onClick={() => setView('timeline')} className="bg-white/90 p-3 rounded-full shadow-md text-stone-600 hover:text-black"><Icons.ArrowLeft className="w-6 h-6" /></button></div>
                             <div className="max-w-3xl mx-auto px-4 py-12">
                                 <div className="bg-white rounded-2xl shadow-sm border border-stone-200 overflow-hidden">
@@ -892,6 +760,7 @@
         // --- AUTH WRAPPER ---
         const App = () => {
             const [isAuthenticated, setIsAuthenticated] = useState(false);
+            const [isTransitioning, setIsTransitioning] = useState(false);
 
             useEffect(() => {
                 if (localStorage.getItem('weddingAuth_' + CONFIG.pinCode) === 'true') {
@@ -899,11 +768,20 @@
                 }
             }, []);
 
-            if (!isAuthenticated) {
-                return <PinScreen onAccess={() => setIsAuthenticated(true)} />;
+            if (!isAuthenticated && !isTransitioning) {
+                return <PinScreen onAccess={() => setIsTransitioning(true)} />;
             }
 
-            return <WeddingTimeline />;
+            // After PinScreen tells us to access, we show a brief fade before mounting the timeline
+            if (isTransitioning) {
+                setTimeout(() => setIsAuthenticated(true), 10);
+            }
+
+            return (
+                <div className="animate-in fade-in zoom-in-95 duration-1000 ease-out">
+                    <WeddingTimeline />
+                </div>
+            );
         };
 
         const root = ReactDOM.createRoot(document.getElementById('root'));
