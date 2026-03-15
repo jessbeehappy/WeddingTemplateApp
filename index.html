@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Wedding Day-Of Timeline</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+    
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' fill='%23fff1f2' rx='100' ry='100'/%3E%3Cpath fill='%23f43f5e' d='M256 420.4l-27.2-24.7C132.3 308.3 68 250.3 68 179.2 68 121.4 113.4 75.7 171 75.7c32.6 0 63.8 15.2 85 39.5 21.2-24.3 52.4-39.5 85-39.5 57.6 0 103 45.7 103 103.5 0 71.1-64.3 129.1-160.8 216.5L256 420.4z' opacity='0.15'/%3E%3Ctext x='50%25' y='54%25' dominant-baseline='middle' text-anchor='middle' font-family='Georgia, serif' font-size='160' fill='%231c1917'%3EB%26G%3C/text%3E%3C/svg%3E">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' fill='%23fff1f2'/%3E%3Cpath fill='%23f43f5e' d='M256 420.4l-27.2-24.7C132.3 308.3 68 250.3 68 179.2 68 121.4 113.4 75.7 171 75.7c32.6 0 63.8 15.2 85 39.5 21.2-24.3 52.4-39.5 85-39.5 57.6 0 103 45.7 103 103.5 0 71.1-64.3 129.1-160.8 216.5L256 420.4z' opacity='0.15'/%3E%3Ctext x='50%25' y='54%25' dominant-baseline='middle' text-anchor='middle' font-family='Georgia, serif' font-size='160' fill='%231c1917'%3EB%26G%3C/text%3E%3C/svg%3E">
+    
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <style>
+        body { font-family: 'Inter', sans-serif; overflow-x: hidden; }
+        h1, h2, h3, .font-serif { font-family: 'Playfair Display', serif; }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #d6d3d1; border-radius: 4px; }
+        .custom-checkbox:checked + div { background-color: currentColor; border-color: currentColor; }
+        .custom-checkbox:checked + div svg { display: block; }
+        html { scroll-behavior: smooth; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        /* Shake animation for incorrect PIN */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-5px); }
+            40%, 80% { transform: translateX(5px); }
+        }
+        .animate-shake { animation: shake 0.4s ease-in-out; }
+    </style>
+</head>
+<body class="bg-stone-50">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        // ============================================================================
+        // 🛠️ THE MASTER CONFIGURATION (EDIT THIS SECTION FOR EACH WEDDING)
+        // ============================================================================
+        const CONFIG = {
+            // General Info
+            coupleNames: "Bride & Groom",
+            weddingDate: "2026-08-28T00:00:00", // YYYY-MM-DD format for timer
+            displayDate: "August 28, 2026",
+            weddingLocation: "Sydney, Australia",
+            
+            // Password Protection
+            pinCode: "2808",
+            
+            // Design (Options: 'classic' (stone/black), 'rose', 'sage', 'ocean')
+            theme: "classic", 
+            
+            // Features
+            enableMapScreen: false, 
+            mapImageURL: "https://via.placeholder.com/800x1200?text=Map+Placeholder",
+            
+            // Footer text
+            footerMessage: "We can't wait to celebrate with you!",
+            footerSignoff: "Best wishes • The Bride & Groom",
+
+            // Helpful Links Hub (Info button)
+            helpfulLinks: [
+                { title: "Venue Website & Directions", url: "https://maps.google.com" },
+                { title: "Accommodation Details", url: "#" },
+                { title: "Digital Guestbook", url: "#" }
+            ],
+
+            // Custom Filters (id matches 'teams' in events array)
+            filters: [
+                { id: 'all', label: 'Everyone' },
+                { id: 'bride', label: 'Bride' },
+                { id: 'groom', label: 'Groom' },
+                { id: 'bridesmaids', label: 'Bridesmaids' },
+                { id: 'groomsmen', label: 'Groomsmen' },
+                { id: 'parents', label: 'Parents' }
+            ]
+        };
+
+        // Vendor Directory
+        const vendors = [
+            { role: 'Venue Coordinator', name: 'Venue Manager', contact: 'TBA', email: '' },
+            { role: 'Hair & Makeup Artist', name: 'HMUA Team', contact: 'TBA', email: '' },
+            { role: 'DJ / Photobooth', name: 'Entertainment Team', contact: 'TBA', email: '' },
+            { role: 'Stylist / Florist', name: 'Floral Designer', contact: 'TBA', email: '' },
+            { role: 'Photographer', name: 'Lead Photographer', contact: 'TBA', email: '' },
+            { role: 'Videographer', name: 'Lead Videographer', contact: 'TBA', email: '' },
+            { role: 'Transport', name: 'Shuttle Service', contact: 'TBA', email: '' },
+            { role: 'Celebrant', name: 'Wedding Celebrant', contact: 'TBA', email: '' }
+        ];
+
+        // The Full Timeline 
+        const events = [
+            {
+                id: 1, time: '6:30 AM', title: 'Wake Up & Get Ready!',
+                location: 'Getting Ready Location', responsible: ['Bride', 'Groom'], teams: ['all'],
+                description: 'Everyone wakes up. Time to brush teeth and get the day started!',
+                links: [{ text: "Google Drive Quick Links", url: "#" }]
+            },
+            {
+                id: 2, time: '7:00 AM', title: 'Hair and Make Up Start',
+                location: 'Bridal Suite', responsible: ['Bride'], teams: ['bridesmaids'],
+                description: [
+                    { type: 'paragraph', text: 'Makeup Artists arrive. Please have clean faces!' },
+                    { type: 'list', items: [
+                        '7:00am: Bridesmaid 1 - Hair',
+                        '7:00am: Maid of Honor - Makeup',
+                        '7:30am: Bridesmaid 2 - Hair',
+                        '7:45am: Bridesmaid 1 - Makeup'
+                    ]}
+                ], links: []
+            },
+            {
+                id: 3, time: '8:00 AM', title: 'Hair and Make Up - Part 2',
+                location: 'Bridal Suite', responsible: ['Bride'], teams: ['bridesmaids'],
+                description: [
+                    '8:00am: Maid of Honor - Hair',
+                    '8:30am: Bridesmaid 3 - Hair',
+                    '8:30am: Bridesmaid 2 - Makeup'
+                ], links: []
+            },
+            {
+                id: 4, time: '8:30 AM', title: 'Breakfast Setup & Decor',
+                location: 'Getting Ready Location', responsible: ['Best Man', 'Bridesmaid 2'], teams: ['bridesmaids', 'groomsmen'],
+                description: [
+                    'Start helping with Breakfast setup',
+                    'Start helping with Morning Ceremony setup',
+                    'Bridesmaids start steaming dresses + veil'
+                ], links: []
+            },
+            {
+                id: 5, time: '9:00 AM', title: 'Hair and Make Up - Mums',
+                location: 'Bridal Suite', responsible: ['Bride'], teams: ['bridesmaids', 'parents'],
+                description: [
+                    '9:00am: Mum 1 - Hair',
+                    '9:15am: Bridesmaid 3 - Makeup',
+                    '9:30am: Mum 2 - Hair',
+                    'Bridesmaids start steaming dresses'
+                ], links: []
+            },
+            {
+                id: 6, time: '9:30 AM', title: 'Groomsmen to begin getting ready & packing',
+                location: 'Groom Suite', responsible: ['Best Man'], teams: ['bridesmaids', 'groomsmen'],
+                description: [
+                    { type: 'paragraph', text: 'Groomsmen need to be fully packed and ready to go. The shuttle waits for no one!' },
+                    { type: 'checklist', items: [
+                        'Suit & Tie on',
+                        'Bags packed for Venue',
+                        'Outfit changes',
+                        'Rings',
+                        'Vows'
+                    ]},
+                    { type: 'paragraph', text: 'Once you are ready, help move luggage to the front door.' }
+                ], links: []
+            },
+            {
+                id: 7, time: '10:00 AM', title: 'The Bride + Mums Hair & Make Up',
+                location: 'Bridal Suite', responsible: ['Bride'], teams: ['bride', 'parents'],
+                description: [
+                    '10:00am: Bride - Hair & Makeup',
+                    '10:00am: Mum 2 - Makeup',
+                    '10:45am: Mum 1 - Makeup',
+                    'Bridesmaids start steaming dresses and getting ready'
+                ], links: []
+            },
+            {
+                id: 8, time: '10:30 AM', title: 'Have you eaten?',
+                location: 'Getting Ready Location', responsible: ['All Parties'], teams: ['all'],
+                description: 'Make sure people have eaten and drank water. Some may start getting ready during this time',
+                links: []
+            },
+            {
+                id: 9, time: '11:00 AM', title: 'Everyone is dressed!',
+                location: 'Getting Ready Location', responsible: ['Bride', 'Groom'], teams: ['all'],
+                description: [
+                    'Bridesmaids are dressed',
+                    'Groomsmen to get dressed',
+                    'Parents are dressed',
+                    'Bride and Groom are ready for Morning Ceremony',
+                    'Bride and Groom family start to arrive at 11:30am',
+                    'Bridesmaids to finalise steaming dresses and veil'
+                ], links: []
+            },
+            {
+                id: 10, time: '11:30 AM', title: 'Photography & Videography Arrives & Setup',
+                location: 'Getting Ready Location', responsible: ['Maid of Honor', 'Bridesmaid 2', 'Bridesmaid 3'], teams: ['all'],
+                description: [
+                    { type: 'list', items: [
+                        '11:30am: Photographer & Videographer arrive',
+                        'Finalise Morning decoration setup',
+                        'Family ensure ceremony items are ready'
+                    ]},
+                    { type: 'checklist', items: ['Ceremony Items', 'Ingredients', 'Cushion', 'Space Setup'] }
+                ], links: []
+            },
+            {
+                id: 11, time: '12:00 PM', title: 'Morning Ceremony Start!',
+                location: 'Getting Ready Location', responsible: ['Bridesmaid 2'], teams: ['all'],
+                description: [
+                    'Doors Open: Bridal team to open door',
+                    '12:15pm - 1:30pm: Morning Ceremony',
+                    'Bride\'s family served first',
+                    'Groom\'s family to serve next.'
+                ], links: []
+            },
+            {
+                id: 12, time: '1:30 PM', title: 'Final Pack Down & Transport',
+                location: 'Transport to Venue', responsible: ['Best Man', 'Groomsman 1'], teams: ['all'],
+                description: [
+                    { type: 'paragraph', text: 'Shuttle arrives at 1:30pm sharp. We depart at 1:45pm. Ensure all items needed are packed. No time to go back!' },
+                    { type: 'checklist', items: [
+                        'Rings', 'Vows', 'Dress Changes', 'Speech Scripts',
+                        'Bags needed for Reception & Ceremony', 'Bridal Kit', 'Phone Chargers', 'Water/Drinks'
+                    ]}
+                ], links: []
+            },
+            {
+                id: 13, time: '2:00 PM', title: 'Reception Preparation + Rehearsal',
+                location: 'Venue', responsible: ['Bride', 'Groom'], teams: ['all'],
+                description: '2:15pm - 3:30pm: Reception preparation and dry run of the ceremony.',
+                links: []
+            },
+            {
+                id: 14, time: '3:30 PM', title: 'Guest Transport & Reception + Ceremony Setup',
+                location: 'Hotel / Venue', responsible: ['Bride', 'Bridesmaid 2', 'Groomsman 1', 'Maid of Honor', 'Best Man'], teams: ['bride', 'bridesmaids', 'groomsmen', 'groom'],
+                description: [
+                    { type: 'paragraph', text: '3:30pm: Shuttle picks up guests from Hotel.' },
+                    { type: 'paragraph', text: 'Styling setup continues (Floral, Wishing Well).' },
+                    { type: 'checklist', items: [
+                        'Table Flowers', 'Wishing well + Guest Book table', 'Table Menus',
+                        'Personal notes + place cards', 'Lamps/Candles for each table', 'Photo Booth Props'
+                    ]},
+                    { type: 'paragraph', text: 'Ceremony area set up - flower arrangements' },
+                    { type: 'paragraph', text: 'Bride to change into wedding dress, final touch ups' }
+                ], links: []
+            },
+            {
+                id: 15, time: '4:00 PM', title: 'First Look + Guest start to arrive',
+                location: 'Venue Grounds', responsible: ['Bride', 'Groom'], teams: ['bride', 'groom'],
+                description: [
+                    { type: 'paragraph', text: '4:00pm: Bride and Groom meet for first look with Maid of Honor and Best Man' },
+                    { type: 'paragraph', text: '4:00pm: Guests arrive and are seated. Rest of bridal party to mingle. Water is served to guests before ceremony start.' }
+                ], links: []
+            },
+            {
+                id: 16, time: '4:30 PM', title: 'Wedding Ceremony',
+                location: 'Ceremony Location', responsible: ['MC / Coordinator'], teams: ['all'],
+                description: [
+                    { type: 'paragraph', text: 'The Ceremony will begin!' },
+                    { type: 'paragraph', text: 'Entrance Order - Officiant, Groomsmen, Bridesmaids, Bride + Escort' },
+                    { type: 'paragraph', text: 'Group Photo Priority List:' },
+                    { type: 'checklist', items: [
+                        'Immediate family (Partner 1)',
+                        'Immediate family (Partner 2)',
+                        'Extended family',
+                        'Bridal Party (ALL)',
+                        'Bridal Party (Bridesmaids)',
+                        'Bridal Party (Groomsmen)',
+                        'School/Uni friends',
+                        'Family friends'
+                    ]}
+                ], links: []
+            },
+            {
+                id: 17, time: '5:00 PM', title: 'Vendors Arrive (DJ/Photobooth)',
+                location: 'Reception Hall', responsible: ['MC / Coordinator'], teams: ['all'],
+                description: ['Vendors set up at the Reception Hall'], links: []
+            },
+            {
+                id: 18, time: '5:30 PM', title: 'Aperitivo (Cocktail Hour)',
+                location: 'Venue Grounds', responsible: ['MC / Coordinator'], teams: ['all'],
+                description: [
+                    'MC to ensure photos are done before heading to food/drinks.',
+                    '5:30pm - 6:15pm: Drinks, mingling, and bridal party photos',
+                    '5:45pm: Table set up ready at the hall - Photographers to do styling shots before guest arrive/enter.',
+                    '6:15pm: Door opens'
+                ], links: []
+            },
+            {
+                id: 19, time: '6:00 PM', title: 'Reception Table Setting Finalised & Doors Open',
+                location: 'Reception Hall', responsible: ['MC', 'Bridesmaid 2'], teams: ['all'],
+                description: [
+                    'Door are open. Ensure photographers have taken photos of the empty hall before people enter.',
+                    'Guest to be seated'
+                ], links: []
+            },
+            {
+                id: 20, time: '6:30 PM', title: 'Wedding Reception Starts!',
+                location: 'Reception Hall', responsible: ['MC'], teams: ['all'],
+                description: [
+                    { type: 'paragraph', text: 'MC to kick off the Reception and get guest seated for the Grand Entrances' },
+                    { type: 'paragraph', text: '6:30pm: Grand Entrances! Order: Bridal Party pairs, Bride & Groom' },
+                    { type: 'paragraph', text: '6:40pm: House keeping' },
+                    { type: 'checklist', items: [
+                        'MC Introduction', 'Bathroom Location', 'Menu details', 'Open Bar details',
+                        'Wishing Well / Guest Book', 'Photobooth timing'
+                    ]},
+                    { type: 'paragraph', text: '6:40pm: Speeches (Parents of the Bride & Groom)' }
+                ], links: []
+            },
+            {
+                id: 21, time: '7:00 PM', title: 'Dinner & Golden Hour Photos',
+                location: 'Reception Hall', responsible: ['Bride', 'Groom'], teams: ['all'],
+                description: [
+                    '7:00pm: Sides & Mains served',
+                    'Couple golden hour photoshoot'
+                ], links: []
+            },
+            {
+                id: 22, time: '7:30 PM', title: 'Speeches continue!',
+                location: 'Reception Hall', responsible: ['Maid of Honor', 'Groom', 'Bride', 'Best Man'], teams: ['bride', 'groom', 'bridesmaids', 'groomsmen'],
+                description: [
+                    { type: 'paragraph', text: 'Wait for Bride and Groom to return for Final set of speeches:' },
+                    { type: 'checklist', items: [
+                        'Maid of Honor Speech',
+                        'Best Man Speech',
+                        'Bride and Groom Speech'
+                    ]}
+                ], links: []
+            },
+            {
+                id: 23, time: '8:00 PM', title: 'Dress Change + First Dance',
+                location: 'Reception Hall', responsible: ['Maid of Honor', 'Groom'], teams: ['all'],
+                description: [
+                    '8:15pm: Bride changes dress (if applicable)',
+                    '8:20pm: First Dance, Dessert served, and Dance Floor opens!'
+                ], links: []
+            },
+            {
+                id: 24, time: '8:30 PM', title: 'Dance Floor is Open!',
+                location: 'Reception Hall', responsible: ['Guests', 'DJ'], teams: ['all'],
+                description: ['TIME TO PARTY!'], links: []
+            },
+            {
+                id: 25, time: '10:30 PM', title: 'Farewell!',
+                location: 'Reception Hall', responsible: ['DJ'], teams: ['all'],
+                description: [
+                    '10:30pm: DJ Announce that Shuttle bus available',
+                    '10:45pm: Party concludes. Pack down begins.'
+                ], links: []
+            },
+            {
+                id: 26, time: '11:00 PM', title: 'Bridal Party returns back to Hotel!',
+                location: 'Hotel', responsible: ['MC', 'Best Man'], teams: ['all'],
+                description: ['Party Over! Bridal Party head to shuttle bus.'], links: []
+            }
+        ];
+        // ============================================================================
+        // END CONFIGURATION
+        // ============================================================================
+
+        // --- THEME ENGINE ---
+        const THEMES = {
+            classic: { bg: 'bg-stone-50', text: 'text-stone-900', light: 'bg-stone-100', border: 'border-stone-200', accent: 'bg-black text-white border-black', accentText: 'text-black', fill: 'fill-stone-200', overlay: 'bg-stone-800' },
+            rose: { bg: 'bg-rose-50', text: 'text-rose-900', light: 'bg-rose-100', border: 'border-rose-200', accent: 'bg-rose-700 text-white border-rose-700', accentText: 'text-rose-700', fill: 'fill-rose-200', overlay: 'bg-rose-900' },
+            sage: { bg: 'bg-emerald-50', text: 'text-emerald-900', light: 'bg-emerald-100', border: 'border-emerald-200', accent: 'bg-emerald-700 text-white border-emerald-700', accentText: 'text-emerald-700', fill: 'fill-emerald-200', overlay: 'bg-emerald-900' },
+            ocean: { bg: 'bg-sky-50', text: 'text-sky-900', light: 'bg-sky-100', border: 'border-sky-200', accent: 'bg-sky-700 text-white border-sky-700', accentText: 'text-sky-700', fill: 'fill-sky-200', overlay: 'bg-sky-900' }
+        };
+        const activeTheme = THEMES[CONFIG.theme] || THEMES.classic;
+
+        // --- ICONS ---
+        const Icons = {
+            ChevronDown: ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m6 9 6 6 6-6"/></svg>,
+            ChevronUp: ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m18 15-6-6-6 6"/></svg>,
+            Heart: ({ className, fillClass }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`${className} ${fillClass}`}><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>,
+            Clock: ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>,
+            Search: ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>,
+            X: ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>,
+            Check: ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className={className}><polyline points="20 6 9 17 4 12"></polyline></svg>,
+            User: ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>,
+            MapPin: ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>,
+            ExternalLink: ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>,
+            ArrowRight: ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>,
+            ArrowLeft: ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>,
+            Phone: ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>,
+            Mail: ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>,
+            ZoomIn: ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="11" cy="11" r="8"/><line x1="21" x2="16.65" y1="21" y2="16.65"/><line x1="11" x2="11" y1="8" y2="14"/><line x1="8" x2="14" y1="11" y2="11"/></svg>,
+            ZoomOut: ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="11" cy="11" r="8"/><line x1="21" x2="16.65" y1="21" y2="16.65"/><line x1="8" x2="14" y1="11" y2="11"/></svg>,
+            Info: ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>,
+            Lock: ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        };
+
+        // --- PASSWORD SCREEN ---
+        const PinScreen = ({ onAccess }) => {
+            const [pin, setPin] = useState('');
+            const [error, setError] = useState(false);
+
+            const handlePinChange = (e) => {
+                const val = e.target.value.replace(/\D/g, '');
+                setPin(val);
+                if (val.length === 4) {
+                    if (val === CONFIG.pinCode) {
+                        localStorage.setItem('weddingAuth_' + CONFIG.pinCode, 'true');
+                        onAccess();
+                    } else {
+                        setError(true);
+                        setTimeout(() => { setPin(''); setError(false); }, 500);
+                    }
+                }
+            };
+
+            return (
+                <div className={`min-h-screen flex flex-col items-center justify-center px-4 ${activeTheme.bg}`}>
+                    <div className="text-center mb-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
+                        <Icons.Lock className={`w-8 h-8 mx-auto mb-6 text-stone-300`} />
+                        <h1 className="text-4xl sm:text-5xl font-serif text-black mb-3">{CONFIG.coupleNames}</h1>
+                        <p className="text-stone-500 font-light tracking-wide">{CONFIG.displayDate}</p>
+                        <p className="text-stone-400 font-light text-sm mt-1">{CONFIG.weddingLocation}</p>
+                    </div>
+                    
+                    <div className={`transition-transform duration-300 ${error ? 'animate-shake' : ''}`}>
+                        <input 
+                            type="password" 
+                            inputMode="numeric" 
+                            pattern="[0-9]*"
+                            autoFocus
+                            maxLength={4}
+                            value={pin}
+                            onChange={handlePinChange}
+                            className="w-48 text-center text-4xl tracking-[0.5em] p-4 rounded-2xl border-2 border-stone-200 focus:border-stone-400 outline-none bg-white shadow-sm transition-colors font-mono placeholder:text-stone-200 placeholder:-translate-y-1"
+                            placeholder="••••"
+                        />
+                    </div>
+                    <div className="h-6 mt-4">
+                        {error && <p className="text-rose-500 text-sm font-medium transition-opacity">Incorrect PIN</p>}
+                    </div>
+                </div>
+            );
+        };
+
+        // --- COMPONENTS ---
+        const HelpfulLinksModal = ({ onClose }) => (
+            <div className="fixed inset-0 bg-black/60 z-[100] flex items-center justify-center p-4 animate-in fade-in">
+                <div className="bg-white rounded-2xl w-full max-w-sm overflow-hidden shadow-2xl animate-in slide-in-from-bottom-8">
+                    <div className={`${activeTheme.light} px-6 py-4 flex justify-between items-center border-b ${activeTheme.border}`}>
+                        <h3 className="font-serif text-xl">Helpful Links</h3>
+                        <button onClick={onClose} className="p-1 rounded-full hover:bg-black/10 transition"><Icons.X className="w-5 h-5" /></button>
+                    </div>
+                    <div className="p-6 space-y-3">
+                        {CONFIG.helpfulLinks.map((link, i) => (
+                            <a key={i} href={link.url} target="_blank" className={`flex items-center gap-3 p-4 rounded-xl border ${activeTheme.border} hover:${activeTheme.light} transition-colors group`}>
+                                <Icons.ExternalLink className={`w-5 h-5 ${activeTheme.accentText} opacity-70 group-hover:opacity-100`} />
+                                <span className="font-medium text-stone-800">{link.title}</span>
+                            </a>
+                        ))}
+                    </div>
+                </div>
+            </div>
+        );
+
+        const EasterEggMessage = ({ onClose }) => (
+            <div className={`fixed inset-0 ${activeTheme.bg} z-[100] overflow-hidden animate-in fade-in duration-700 flex flex-col items-center justify-center p-8 text-center`}>
+                <button onClick={onClose} className={`absolute top-8 right-8 p-3 ${activeTheme.light} rounded-full transition-colors`}>
+                    <Icons.X className="w-6 h-6" />
+                </button>
+                <div className="max-w-lg space-y-8 animate-in slide-in-from-bottom-8 duration-1000 delay-150">
+                    <div className="flex justify-center mb-6">
+                        <div className={`p-4 ${activeTheme.light} rounded-full`}><Icons.Heart className={`w-16 h-16 ${activeTheme.accentText}`} fillClass={activeTheme.fill} /></div>
+                    </div>
+                    <h2 className="text-4xl font-serif mb-4 tracking-wide">Take a deep breath.</h2>
+                    <div className="space-y-6 font-light text-lg leading-relaxed">
+                        <p>Today is going to be the <span className="font-medium">best day of your lives</span>.</p>
+                        <p>Be present in every moment. Soak it all in. Look at the people who love you.</p>
+                        <p>Don't sweat the small stuff, everything is exactly as it should be.</p>
+                    </div>
+                    <div className="pt-12"><p className={`${activeTheme.accentText} text-xs font-mono uppercase tracking-[0.3em]`}>Enjoy every second</p></div>
+                </div>
+            </div>
+        );
+
+        const GenericChecklist = ({ title, itemsData, onClose }) => {
+            const [items, setItems] = useState(itemsData);
+            const toggleItem = (id) => setItems(items.map(item => item.id === id ? { ...item, checked: !item.checked } : item));
+            const progress = Math.round((items.filter(i => i.checked).length / items.length) * 100);
+            return (
+                <div className={`fixed inset-0 ${activeTheme.overlay} text-white z-[100] overflow-y-auto animate-in fade-in duration-300`}>
+                    <div className="max-w-2xl mx-auto p-8">
+                        <div className="flex justify-between items-start mb-4">
+                            <div><h2 className="text-4xl font-serif mb-2 text-white">{title}</h2><p className="text-white/50 font-mono text-sm tracking-widest uppercase">Protocol</p></div>
+                            <button onClick={onClose} className="p-2 bg-white/10 rounded-full hover:bg-white/20 transition-colors"><Icons.X className="w-6 h-6 text-white" /></button>
+                        </div>
+                        <div className={`sticky top-0 z-30 ${activeTheme.overlay} pb-8 pt-4 mb-4 border-b border-white/10`}>
+                            <div className="flex justify-between text-xs font-mono mb-2 uppercase tracking-wider text-white/50">
+                                <span>{progress === 100 ? "Ready!" : "Readiness"}</span>
+                                <span>{progress}%</span>
+                            </div>
+                            <div className="h-1 bg-white/10 rounded-full overflow-hidden"><div className="h-full bg-white transition-all duration-500 ease-out" style={{ width: `${progress}%` }}></div></div>
+                        </div>
+                        <div className="space-y-4">
+                            {items.map(item => (
+                                <label key={item.id} className="group flex items-center p-4 bg-white/5 border border-white/10 rounded-xl cursor-pointer hover:bg-white/10 transition-all">
+                                    <input type="checkbox" className="hidden custom-checkbox text-white" checked={item.checked} onChange={() => toggleItem(item.id)} />
+                                    <div className={`w-6 h-6 border-2 border-white/30 rounded-md flex items-center justify-center mr-4 transition-colors group-hover:border-white/50 ${item.checked ? 'bg-white border-white' : ''}`}>
+                                        <Icons.Check className={`w-4 h-4 ${activeTheme.accentText} ${item.checked ? 'block' : 'hidden'}`} />
+                                    </div>
+                                    <span className={`text-lg font-light tracking-wide transition-opacity ${item.checked ? 'opacity-30 line-through' : 'opacity-100'}`}>{item.text}</span>
+                                </label>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // --- MAIN APP ---
+        const WeddingTimeline = () => {
+            const [expandedEvent, setExpandedEvent] = useState(null);
+            const [selectedFilters, setSelectedFilters] = useState(['all']);
+            const [searchQuery, setSearchQuery] = useState('');
+            const [expandAll, setExpandAll] = useState(false);
+            const [currentTime, setCurrentTime] = useState(new Date());
+            const [countdown, setCountdown] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+            
+            const [showFilters, setShowFilters] = useState(false);
+            const [showLinks, setShowLinks] = useState(false);
+            
+            // View Navigation
+            const [view, setView] = useState('timeline'); // 'map', 'timeline', 'vendors'
+            const [mapZoom, setMapZoom] = useState(false);
+
+            // Easter Egg States
+            const [clickCount1, setClickCount1] = useState(0);
+            const [clickCount2, setClickCount2] = useState(0);
+            const [showEggMessage, setShowEggMessage] = useState(false);
+            const [showEggList, setShowEggList] = useState(false);
+
+            const activeRef = useRef(null); 
+            const weddingDate = new Date(CONFIG.weddingDate);
+
+            // Time and Auto-Scroll
+            useEffect(() => { const timer = setInterval(() => setCurrentTime(new Date()), 60000); return () => clearInterval(timer); }, []);
+            
+            useEffect(() => {
+                window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+                if (activeRef.current && view === 'timeline') {
+                    setTimeout(() => activeRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' }), 500); 
+                }
+            }, [view]);
+
+            // Countdown Timer
+            useEffect(() => {
+                const updateCountdown = () => {
+                    const now = new Date();
+                    const difference = weddingDate.getTime() - now.getTime();
+                    if (difference > 0) {
+                        setCountdown({
+                            days: Math.floor(difference / (1000 * 60 * 60 * 24)),
+                            hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
+                            minutes: Math.floor((difference / 1000 / 60) % 60),
+                            seconds: Math.floor((difference / 1000) % 60)
+                        });
+                    } else { setCountdown({ days: 0, hours: 0, minutes: 0, seconds: 0 }); }
+                };
+                updateCountdown();
+                const timer = setInterval(updateCountdown, 1000);
+                return () => clearInterval(timer);
+            }, []);
+
+            // Gesture Swiping Logic (RESTRICTED TO BANNER ONLY via handlers on the header)
+            const [touchStart, setTouchStart] = useState(null);
+            const [touchEnd, setTouchEnd] = useState(null);
+            const minSwipeDistance = 50;
+            
+            const onTouchStart = (e) => { setTouchEnd(null); setTouchStart(e.targetTouches[0].clientX); };
+            const onTouchMove = (e) => { setTouchEnd(e.targetTouches[0].clientX); };
+            const onTouchEnd = () => {
+                if (!touchStart || !touchEnd) return;
+                const distance = touchStart - touchEnd;
+                const isLeftSwipe = distance > minSwipeDistance;
+                const isRightSwipe = distance < -minSwipeDistance;
+                
+                if (isLeftSwipe) {
+                    if (view === 'timeline') setView('vendors');
+                    if (view === 'map') setView('timeline');
+                }
+                if (isRightSwipe) {
+                    if (view === 'timeline' && CONFIG.enableMapScreen) setView('map');
+                    if (view === 'vendors') setView('timeline');
+                }
+            };
+
+            const parseEventTime = (timeStr) => {
+                const [time, period] = timeStr.split(' ');
+                let [hours, minutes] = time.split(':').map(Number);
+                if (period === 'PM' && hours !== 12) hours += 12;
+                if (period === 'AM' && hours === 12) hours = 0;
+                return hours * 60 + minutes; 
+            };
+
+            const isWeddingDay = currentTime.toDateString() === weddingDate.toDateString(); 
+            const currentMinutes = currentTime.getHours() * 60 + currentTime.getMinutes();
+
+            // RENDER LOGIC
+            const renderDescriptionContent = (desc) => {
+                if (typeof desc === 'string') return <p className="text-stone-700 mt-4 leading-relaxed">{desc}</p>;
+                if (Array.isArray(desc) && typeof desc[0] === 'string') {
+                    return <ul className="text-stone-700 mt-4 leading-relaxed list-none space-y-2">{desc.map((line, idx) => <li key={idx} className="flex items-start gap-2"><span className="text-stone-400 mt-1.5 w-1.5 h-1.5 rounded-full bg-stone-300 shrink-0"></span><span>{line}</span></li>)}</ul>;
+                }
+                if (Array.isArray(desc) && typeof desc[0] === 'object') {
+                    return (
+                        <div className="mt-4 space-y-4">
+                            {desc.map((section, idx) => {
+                                if (section.type === 'paragraph' || section.type === 'text') return <p key={idx} className="text-stone-700 leading-relaxed">{section.text}</p>;
+                                if (section.type === 'list') return <ul key={idx} className="text-stone-700 leading-relaxed list-none space-y-2 pl-1">{section.items.map((line, i) => <li key={i} className="flex items-start gap-2"><span className="text-stone-400 mt-1.5 w-1.5 h-1.5 rounded-full bg-stone-300 shrink-0"></span><span>{line}</span></li>)}</ul>;
+                                if (section.type === 'checklist') return <div key={idx} className={`space-y-2 ${activeTheme.light} p-3 rounded-lg border ${activeTheme.border}`}>{section.items.map((item, i) => <label key={i} className="flex items-center gap-3 cursor-pointer group"><div className="relative flex items-center"><input type="checkbox" className="peer appearance-none w-5 h-5 border-2 border-stone-300 rounded bg-white checked:bg-black checked:border-black transition-colors" /><Icons.Check className="w-3.5 h-3.5 text-white absolute left-[3px] top-[3px] opacity-0 peer-checked:opacity-100 pointer-events-none" /></div><span className="text-sm text-stone-600 group-hover:text-black transition-colors select-none">{item}</span></label>)}</div>;
+                                return null;
+                            })}
+                        </div>
+                    );
+                }
+                return null;
+            };
+
+            const filteredEvents = events.filter(event => {
+                const teamMatch = selectedFilters.includes('all') || event.teams.includes('all') || event.teams.some(team => selectedFilters.includes(team));
+                const searchTextMatches = (text) => text.toLowerCase().includes(searchQuery.toLowerCase());
+                
+                let descMatch = false;
+                if (typeof event.description === 'string') descMatch = searchTextMatches(event.description);
+                else if (Array.isArray(event.description)) {
+                    descMatch = event.description.some(item => typeof item === 'string' ? searchTextMatches(item) : (item.text && searchTextMatches(item.text)) || (item.items && item.items.some(i => searchTextMatches(i))));
+                }
+
+                const searchMatch = searchQuery === '' || searchTextMatches(event.title) || descMatch || searchTextMatches(event.location) || searchTextMatches(event.time) || (event.responsible && event.responsible.some(r => searchTextMatches(r)));
+                return teamMatch && searchMatch;
+            });
+
+            const firstActiveIndex = filteredEvents.findIndex(event => !(isWeddingDay && parseEventTime(event.time) < currentMinutes - 30));
+
+            const toggleFilter = (filterId) => {
+                // Generic Easter Eggs triggering
+                if (filterId === CONFIG.filters[1]?.id) {
+                    setClickCount2(0); const newCount = clickCount1 + 1; setClickCount1(newCount);
+                    if (newCount >= 3) { setShowEggMessage(true); setClickCount1(0); }
+                } else if (filterId === CONFIG.filters[3]?.id || filterId === 'bridesmaids') {
+                    setClickCount1(0); const newCount = clickCount2 + 1; setClickCount2(newCount);
+                    if (newCount >= 4) { 
+                        setShowEggList(true); setClickCount2(0); 
+                    }
+                } else {
+                    setClickCount1(0); setClickCount2(0);
+                }
+
+                if (filterId === 'all') { setSelectedFilters(['all']); } 
+                else {
+                    setSelectedFilters(prev => {
+                        const cleanPrev = prev.filter(f => f !== 'all');
+                        if (prev.includes(filterId)) { const newFilters = cleanPrev.filter(f => f !== filterId); return newFilters.length === 0 ? ['all'] : newFilters; } 
+                        else { return [...cleanPrev, filterId]; }
+                    });
+                }
+            };
+
+            const toggleExpandAll = () => { setExpandAll(!expandAll); if (!expandAll) setExpandedEvent(null); };
+
+            // Base Layout sizing calculation
+            const layoutWidth = CONFIG.enableMapScreen ? 'w-[300%]' : 'w-[200%]';
+            const translation = CONFIG.enableMapScreen 
+                ? (view === 'map' ? '0' : view === 'timeline' ? '33.333' : '66.666')
+                : (view === 'timeline' ? '0' : '50');
+            const panelWidth = CONFIG.enableMapScreen ? 'w-1/3' : 'w-1/2';
+
+            return (
+                <div className={`overflow-x-hidden w-full relative min-h-screen ${activeTheme.bg}`}>
+                    {showEggList && <GenericChecklist title="Essentials" itemsData={[{id:1, text:"Attire Ready", checked:false}, {id:2, text:"Rings/Vows", checked:false}, {id:3, text:"Deodorant/Perfume", checked:false}, {id:4, text:"Phone Charger", checked:false}, {id:5, text:"Have Fun!", checked:false}]} onClose={() => setShowEggList(false)} />}
+                    {showEggMessage && <EasterEggMessage onClose={() => setShowEggMessage(false)} />}
+                    {showLinks && <HelpfulLinksModal onClose={() => setShowLinks(false)} />}
+
+                    {/* --- DESKTOP NAVIGATION ARROWS --- */}
+                    <div className="hidden md:block fixed top-1/2 left-8 z-50 transform -translate-y-1/2">
+                        {view === 'timeline' && CONFIG.enableMapScreen && <button onClick={() => setView('map')} className="bg-white/80 backdrop-blur shadow-lg p-4 rounded-full hover:bg-white transition-all hover:scale-110 border border-stone-100"><Icons.ArrowLeft className="w-6 h-6" /></button>}
+                        {view === 'vendors' && <button onClick={() => setView('timeline')} className="bg-white/80 backdrop-blur shadow-lg p-4 rounded-full hover:bg-white transition-all hover:scale-110 border border-stone-100"><Icons.ArrowLeft className="w-6 h-6" /></button>}
+                    </div>
+                    <div className="hidden md:block fixed top-1/2 right-8 z-50 transform -translate-y-1/2">
+                        {view === 'timeline' && <button onClick={() => setView('vendors')} className="bg-white/80 backdrop-blur shadow-lg p-4 rounded-full hover:bg-white transition-all hover:scale-110 border border-stone-100"><Icons.ArrowRight className="w-6 h-6" /></button>}
+                        {view === 'map' && <button onClick={() => setView('timeline')} className="bg-white/80 backdrop-blur shadow-lg p-4 rounded-full hover:bg-white transition-all hover:scale-110 border border-stone-100"><Icons.ArrowRight className="w-6 h-6" /></button>}
+                    </div>
+
+                    {/* --- SLIDING CONTAINER --- */}
+                    <div className={`flex ${layoutWidth} transition-transform duration-500 ease-in-out`} style={{ transform: `translateX(-${translation}%)` }}>
+                        
+                        {/* --- VIEW 1: MAP (ONLY RENDER IF ENABLED) --- */}
+                        {CONFIG.enableMapScreen && (
+                            <div className={`${panelWidth} shrink-0 h-screen relative bg-stone-200 flex flex-col`}>
+                                <div className="absolute top-6 left-6 z-10"><button onClick={() => setView('timeline')} className="bg-white/90 p-3 rounded-full shadow-md"><Icons.ArrowRight className="w-6 h-6" /></button></div>
+                                <div onClick={() => setMapZoom(!mapZoom)} className={`flex-1 relative overflow-hidden flex items-center justify-center cursor-zoom-in ${mapZoom ? 'cursor-grab active:cursor-grabbing' : ''}`}>
+                                    <div className={`transition-all duration-300 w-full h-full ${mapZoom ? 'overflow-auto no-scrollbar' : 'overflow-hidden flex items-center justify-center'}`}>
+                                        <img src={CONFIG.mapImageURL} alt="Map" className={`transition-transform duration-300 origin-center ${mapZoom ? 'w-[250%] max-w-none' : 'w-full h-full object-contain p-4'}`} />
+                                    </div>
+                                </div>
+                                <div className={`absolute bottom-8 left-1/2 transform -translate-x-1/2 bg-black/70 text-white px-4 py-2 rounded-full text-xs font-medium transition-opacity duration-300 ${mapZoom ? 'opacity-0' : 'opacity-100'}`}>Tap map to zoom</div>
+                            </div>
+                        )}
+
+                        {/* --- VIEW 2: TIMELINE (CENTER) --- */}
+                        <div className={`${panelWidth} shrink-0 relative z-20 min-h-screen ${activeTheme.bg}`}>
+                            
+                            {/* Header (SWIPE LISTENER ADDED HERE) */}
+                            <header 
+                                className={`bg-white border-b border-stone-200 sticky top-0 z-50 shadow-sm`}
+                                onTouchStart={onTouchStart}
+                                onTouchMove={onTouchMove}
+                                onTouchEnd={onTouchEnd}
+                            >
+                                {/* Drag indicator pill for mobile */}
+                                <div className="w-full flex justify-center pt-2 md:hidden">
+                                    <div className="w-12 h-1.5 bg-stone-200 rounded-full"></div>
+                                </div>
+
+                                <div className="max-w-4xl mx-auto px-4 py-6 pb-6 pt-4 text-center select-none">
+                                    <h1 className="text-4xl font-serif text-black mb-2">{CONFIG.coupleNames}</h1>
+                                    <p className="text-stone-600 font-light tracking-wide">{CONFIG.displayDate}</p>
+                                    <p className="text-stone-500 font-light text-sm mt-1">{CONFIG.weddingLocation}</p>
+                                    
+                                    {countdown.days > 0 || countdown.hours > 0 || countdown.minutes > 0 ? (
+                                        <div className="mt-4 flex items-center justify-center gap-4">
+                                            <Icons.Clock className="w-4 h-4 text-stone-400" />
+                                            <div className="flex gap-3 text-sm">
+                                                {countdown.days > 0 && <div className="flex flex-col items-center"><span className="text-2xl font-serif text-black">{countdown.days}</span><span className="text-xs text-stone-500 uppercase tracking-wide">Days</span></div>}
+                                                <div className="flex flex-col items-center"><span className="text-2xl font-serif text-black">{countdown.hours}</span><span className="text-xs text-stone-500 uppercase tracking-wide">Hours</span></div>
+                                                <div className="flex flex-col items-center"><span className="text-2xl font-serif text-black">{countdown.minutes}</span><span className="text-xs text-stone-500 uppercase tracking-wide">Minutes</span></div>
+                                                <div className="flex flex-col items-center"><span className="text-2xl font-serif text-black">{countdown.seconds}</span><span className="text-xs text-stone-500 uppercase tracking-wide">Seconds</span></div>
+                                            </div>
+                                        </div>
+                                    ) : isWeddingDay ? (
+                                        <div className="mt-4"><p className="text-lg font-serif text-black">Today's the day! 🎉</p></div>
+                                    ) : (
+                                        <div className="mt-4"><p className="text-sm text-stone-500">The big day has arrived!</p></div>
+                                    )}
+                                </div>
+                            </header>
+
+                            {/* Filter Bar */}
+                            <div className="sticky top-[160px] sm:top-[150px] z-40 bg-white border-b border-stone-200 shadow-sm transition-all duration-300">
+                                <div className="max-w-4xl mx-auto px-4">
+                                    <div className="flex items-center justify-between w-full">
+                                        <button onClick={() => setShowFilters(!showFilters)} className="py-4 flex-1 flex items-center justify-between text-stone-600 hover:text-black transition-colors">
+                                            <div className="flex items-center gap-2"><Icons.Search className="w-4 h-4" /><span className="font-serif text-sm uppercase tracking-wider">Search & Filters</span></div>
+                                            {showFilters ? <Icons.ChevronUp className="w-5 h-5" /> : <Icons.ChevronDown className="w-5 h-5" />}
+                                        </button>
+                                        <div className="w-px h-6 bg-stone-200 mx-4"></div>
+                                        <button onClick={() => setShowLinks(true)} className="py-4 flex items-center gap-2 text-stone-600 hover:text-black">
+                                            <Icons.Info className="w-5 h-5" />
+                                            <span className="hidden sm:inline font-serif text-sm uppercase tracking-wider">Info</span>
+                                        </button>
+                                    </div>
+
+                                    {showFilters && (
+                                        <div className="pb-4 animate-in slide-in-from-top-2 duration-200">
+                                            <div className="mb-4">
+                                                <input type="text" placeholder="Search events, locations, or times..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)} className="w-full px-4 py-2 rounded-lg border border-stone-300 focus:outline-none focus:border-black transition-colors"/>
+                                            </div>
+                                            <div className="flex flex-wrap gap-2 justify-center items-center">
+                                                {CONFIG.filters.map(filter => {
+                                                    const isSelected = selectedFilters.includes(filter.id);
+                                                    const btnClass = isSelected ? activeTheme.accent : `bg-stone-100 text-stone-700 hover:${activeTheme.light}`;
+                                                    return (
+                                                        <button key={filter.id} onClick={() => toggleFilter(filter.id)} className={`px-4 py-2 rounded-full text-sm font-light tracking-wide transition-all duration-200 ${btnClass}`}>{filter.label}</button>
+                                                    );
+                                                })}
+                                                <div className="w-px h-6 bg-stone-300 mx-2"></div>
+                                                <button onClick={toggleExpandAll} className="px-4 py-2 rounded-full text-sm font-light tracking-wide transition-all bg-stone-800 text-white hover:bg-black shadow-md">{expandAll ? 'Collapse All' : 'Expand All'}</button>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* Timeline */}
+                            <div className="max-w-3xl mx-auto px-4 py-12 pb-32">
+                                <div className="relative">
+                                    <div className="absolute left-12 top-0 bottom-0 w-px bg-stone-300 transform -translate-x-1/2"></div>
+                                    <div className="space-y-4">
+                                        {filteredEvents.map((event, index) => {
+                                            const isExpanded = expandedEvent === event.id || expandAll;
+                                            const isPast = isWeddingDay && parseEventTime(event.time) < currentMinutes - 30;
+                                            const isFirstActive = index === firstActiveIndex;
+
+                                            return (
+                                                <div key={event.id} ref={isFirstActive ? activeRef : null} className={`relative transition-all duration-500 ease-in-out ${isExpanded ? 'flex flex-col items-center gap-4 py-4 z-20' : 'pl-32'} ${isPast ? 'opacity-60 grayscale' : ''}`}>
+                                                    <div className={`transition-all duration-500 ease-in-out z-10 ${isExpanded ? 'relative w-auto transform translate-x-0' : 'absolute left-0 w-24 flex justify-center mt-1'}`}>
+                                                        <div className={`px-3 py-1.5 rounded-lg shadow-sm relative transition-colors duration-500 ${isPast ? 'bg-stone-200 text-stone-500' : activeTheme.accent}`}>
+                                                            <span className="text-sm font-medium tracking-wide">{event.time}</span>
+                                                        </div>
+                                                    </div>
+                                                    <div className={`bg-white rounded-xl border border-stone-200 overflow-hidden transition-all duration-500 ease-in-out ${isExpanded ? 'w-[100%] sm:w-[95%] shadow-xl relative z-20' : 'w-full shadow-sm hover:shadow-md'}`}>
+                                                        <button onClick={() => toggleEvent(event.id)} className="w-full px-6 py-5 text-left flex items-center justify-between bg-white">
+                                                            <div className="flex-1">
+                                                                <h3 className="text-xl font-serif text-black mb-2">{event.title}</h3>
+                                                                <div className="flex flex-col gap-2">
+                                                                    <a href={`https://maps.google.com/?q=${encodeURIComponent(event.location)}`} target="_blank" rel="noopener noreferrer" className={`inline-flex items-center gap-1.5 text-sm text-stone-500 font-light hover:${activeTheme.accentText} transition-colors w-fit`}>
+                                                                        <Icons.MapPin className="w-3.5 h-3.5" />
+                                                                        <span className="underline underline-offset-2">{event.location}</span>
+                                                                    </a>
+                                                                    {event.responsible && (
+                                                                        <div className="flex items-center gap-1.5 text-xs text-stone-400 font-medium uppercase tracking-wide">
+                                                                            <Icons.User className="w-3.5 h-3.5" />
+                                                                            {event.responsible.join(', ')}
+                                                                        </div>
+                                                                    )}
+                                                                </div>
+                                                            </div>
+                                                            {isExpanded ? <Icons.ChevronUp className="w-5 h-5 text-stone-400" /> : <Icons.ChevronDown className="w-5 h-5 text-stone-400" />}
+                                                        </button>
+                                                        <div className={`transition-all duration-500 ease-in-out overflow-hidden ${isExpanded ? 'max-h-[2000px] opacity-100' : 'max-h-0 opacity-0'}`}>
+                                                            <div className="px-6 pb-6 border-t border-stone-100">
+                                                                {renderDescriptionContent(event.description)}
+                                                                <div className="mt-5 flex flex-wrap gap-2">{event.teams.map(team => (<span key={team} className={`px-3 py-1 ${activeTheme.light} text-stone-600 text-xs rounded-full border ${activeTheme.border}`}>{CONFIG.filters.find(f => f.id === team)?.label || team}</span>))}</div>
+                                                                {event.image && <img src={event.image} alt={event.title} className="mt-4 rounded-xl w-full border border-stone-100" />}
+                                                                {event.links && event.links.length > 0 && (
+                                                                    <div className="mt-4 space-y-2">
+                                                                        {event.links.map((link, idx) => (
+                                                                            <a key={idx} href={link.url} target="_blank" rel="noopener noreferrer" className={`inline-flex items-center gap-2 ${activeTheme.accentText} text-sm underline-offset-4 hover:underline transition-colors`}><Icons.ExternalLink className="w-4 h-4" />{link.text}</a>
+                                                                        ))}
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <footer className="mt-8 border-t border-stone-200">
+                                <div className="max-w-4xl mx-auto px-4 py-12 text-center">
+                                    <Icons.Heart className={`w-6 h-6 mx-auto mb-4 ${activeTheme.accentText}`} fillClass={activeTheme.fill} />
+                                    <p className="text-stone-600 font-light text-sm">{CONFIG.footerMessage}</p>
+                                    <p className="text-stone-400 font-serif italic text-sm mt-4">{CONFIG.footerSignoff}</p>
+                                </div>
+                            </footer>
+                        </div>
+
+                        {/* --- VIEW 3: VENDOR LIST (RIGHT) --- */}
+                        <div className={`${panelWidth} shrink-0 min-h-screen relative ${activeTheme.bg}`}>
+                            <div className="absolute top-6 left-6 z-10"><button onClick={() => setView('timeline')} className="bg-white/90 p-3 rounded-full shadow-md text-stone-600 hover:text-black"><Icons.ArrowLeft className="w-6 h-6" /></button></div>
+                            <div className="max-w-3xl mx-auto px-4 py-12">
+                                <div className="bg-white rounded-2xl shadow-sm border border-stone-200 overflow-hidden">
+                                    <div className={`px-6 py-8 border-b ${activeTheme.border} ${activeTheme.light}`}>
+                                        <h2 className="text-3xl font-serif text-black mb-2">Vendor Directory</h2>
+                                        <p className="text-stone-500 text-sm font-light">Key contacts for the big day.</p>
+                                    </div>
+                                    <div className="divide-y divide-stone-100">
+                                        {vendors.map((vendor, idx) => (
+                                            <div key={idx} className="p-6 flex flex-col sm:flex-row gap-4 sm:items-center justify-between hover:bg-stone-50 transition-colors">
+                                                <div>
+                                                    <p className="text-xs font-bold uppercase tracking-widest text-stone-400 mb-1">{vendor.role}</p>
+                                                    <h3 className="text-lg font-serif text-black">{vendor.name}</h3>
+                                                </div>
+                                                <div className="flex gap-2">
+                                                    {vendor.email && (
+                                                        <a href={`mailto:${vendor.email}`} className={`flex items-center gap-2 border border-stone-200 text-stone-600 px-4 py-2 rounded-full text-sm font-medium hover:${activeTheme.light} transition-colors`}>
+                                                            <Icons.Mail className="w-4 h-4" />
+                                                        </a>
+                                                    )}
+                                                    {vendor.contact && vendor.contact !== 'TBA' ? (
+                                                        <a href={`tel:${vendor.contact}`} className={`flex items-center gap-2 ${activeTheme.accent} px-4 py-2 rounded-full text-sm font-medium transition-opacity hover:opacity-80`}>
+                                                            <Icons.Phone className="w-4 h-4" /><span>Call</span>
+                                                        </a>
+                                                    ) : (
+                                                        <span className="text-xs text-stone-400 font-mono bg-stone-100 px-3 py-1 rounded-full flex items-center">TBA</span>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                                <div className="mt-8 text-center"><button onClick={() => setView('timeline')} className="text-stone-500 hover:text-black text-sm flex items-center justify-center gap-2 mx-auto transition-colors"><Icons.ArrowLeft className="w-4 h-4" />Back to Timeline</button></div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            );
+        };
+
+        // --- AUTH WRAPPER ---
+        const App = () => {
+            const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+            useEffect(() => {
+                if (localStorage.getItem('weddingAuth_' + CONFIG.pinCode) === 'true') {
+                    setIsAuthenticated(true);
+                }
+            }, []);
+
+            if (!isAuthenticated) {
+                return <PinScreen onAccess={() => setIsAuthenticated(true)} />;
+            }
+
+            return <WeddingTimeline />;
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
