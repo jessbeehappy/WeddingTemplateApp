@@ -33,11 +33,7 @@
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            20%, 60% { transform: translateX(-5px); }
-            40%, 80% { transform: translateX(5px); }
-        }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-5px); } 40%, 80% { transform: translateX(5px); } }
         .animate-shake { animation: shake 0.4s ease-in-out; }
     </style>
 </head>
@@ -226,7 +222,6 @@
             Lock: ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
         };
 
-        // --- CUSTOM KEYPAD SCREEN ---
         const PinScreen = ({ onAccess }) => {
             const [pin, setPin] = useState('');
             const [error, setError] = useState(false);
@@ -290,14 +285,13 @@
 
         const ChecklistModal = ({ data, onClose }) => {
             const theme = MODAL_THEMES[data.theme] || MODAL_THEMES.ivory;
-            
-            // Modes: message or checklist
-            const isWeddingDayToday = new Date().toDateString() === new Date(CONFIG.weddingDate).toDateString();
+            const isWeddingDayToday = true; // Use real date in production: new Date().toDateString() === new Date(CONFIG.weddingDate).toDateString();
             const hasMessage = data.messageLines && data.messageLines.length > 0;
-            const [mode, setMode] = useState(hasMessage && isWeddingDayToday ? 'message' : 'checklist');
             
+            const [showMessage, setShowMessage] = useState(hasMessage && isWeddingDayToday);
             const initialItems = data.items ? data.items.map((item, idx) => ({ id: idx, text: item, checked: false })) : [];
             const [items, setItems] = useState(initialItems);
+            
             const toggleItem = (id) => setItems(items.map(item => item.id === id ? { ...item, checked: !item.checked } : item));
             const progress = items.length > 0 ? Math.round((items.filter(i => i.checked).length / items.length) * 100) : 0;
 
@@ -305,55 +299,53 @@
                 <div className={`fixed inset-0 ${theme.bg} z-[100] overflow-y-auto animate-in fade-in duration-300`}>
                     <button onClick={onClose} className={`fixed top-6 right-6 z-[110] p-2 rounded-full transition-colors ${theme.btn}`}><Icons.X className="w-6 h-6" /></button>
                     
-                    {mode === 'message' ? (
-                        <div className="min-h-screen flex flex-col items-center justify-center p-8 text-center animate-in fade-in zoom-in-95 duration-700 relative">
-                            <div className="max-w-lg space-y-8">
-                                <div className="flex justify-center mb-6"><div className={`p-4 rounded-full ${theme.iconBg}`}><Icons.Heart className={`w-16 h-16 ${theme.iconColor}`} /></div></div>
-                                <h2 className={`text-4xl font-serif mb-4 tracking-wide ${theme.title}`}>{data.title}</h2>
-                                <div className={`space-y-6 font-light text-lg leading-relaxed ${theme.text}`}>
+                    <div className="max-w-2xl mx-auto p-6 pt-12 min-h-screen flex flex-col">
+                        <div className="flex justify-between items-start mb-6 pr-12">
+                            <div>
+                                <h2 className={`text-4xl font-serif mb-1 ${theme.title}`}>{data.title}</h2>
+                                <p className={`${theme.signoff} font-mono text-sm tracking-widest uppercase`}>Checklist</p>
+                            </div>
+                        </div>
+
+                        {/* Hidden Message that expands */}
+                        {hasMessage && showMessage && (
+                            <div className={`mb-8 p-6 ${theme.checkBg} rounded-xl border ${theme.border} text-center animate-in fade-in slide-in-from-top-4`}>
+                                <Icons.Heart className={`w-8 h-8 mx-auto mb-4 ${theme.iconColor}`} />
+                                <div className={`space-y-4 font-light text-lg leading-relaxed ${theme.text}`}>
                                     {data.messageLines.map((line, i) => (<p key={i} className={i === 0 ? `text-2xl font-serif italic ${theme.title}` : ""}>{line}</p>))}
                                 </div>
-                                <div className="pt-12"><p className={`${theme.signoff} text-xs font-mono uppercase tracking-[0.3em]`}>{data.signoff || data.footer}</p></div>
-                                
-                                {data.items && data.items.length > 0 && (
-                                    <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2">
-                                        <Icons.Heart className={`w-5 h-5 ${theme.iconColor} cursor-pointer opacity-50 hover:opacity-100 transition-opacity`} onClick={() => setMode('checklist')} />
-                                    </div>
-                                )}
                             </div>
+                        )}
+
+                        <div className={`sticky top-0 z-30 ${theme.bg} pb-6 pt-2 mb-2 border-b ${theme.border}`}>
+                            <div className={`flex justify-between text-xs font-mono mb-2 uppercase tracking-wider ${theme.signoff}`}>
+                                <span>{progress === 100 ? "Ready!" : "Readiness"}</span>
+                                <span>{progress}%</span>
+                            </div>
+                            <div className={`h-1 ${theme.progressBg} rounded-full overflow-hidden`}><div className={`h-full ${theme.progressFill} transition-all duration-500 ease-out`} style={{ width: `${progress}%` }}></div></div>
                         </div>
-                    ) : (
-                        <div className="max-w-2xl mx-auto p-6 pt-12 min-h-screen flex flex-col animate-in fade-in zoom-in-95 duration-500">
-                            <div className="flex justify-between items-start mb-6 pr-12">
-                                <div>
-                                    <div className="flex items-center gap-3 mb-1">
-                                        <h2 className={`text-4xl font-serif ${theme.title}`}>{data.title}</h2>
-                                        {hasMessage && <Icons.Heart className={`w-5 h-5 ${theme.iconColor} cursor-pointer opacity-50 hover:opacity-100 transition-opacity`} onClick={() => setMode('message')} />}
+
+                        <div className="space-y-3 py-4 flex-1">
+                            {items.map(item => (
+                                <label key={item.id} className={`group flex items-center p-4 border rounded-xl cursor-pointer transition-all ${theme.checkBg} ${theme.border} hover:shadow-sm`}>
+                                    <input type="checkbox" className="hidden custom-checkbox" checked={item.checked} onChange={() => toggleItem(item.id)} />
+                                    <div className={`w-6 h-6 border-2 rounded-md flex items-center justify-center mr-4 transition-colors ${theme.checkBorder} ${item.checked ? theme.checkFill : ''}`}>
+                                        <Icons.Check className={`w-4 h-4 ${data.theme === 'dark' || data.theme === 'charcoal' ? 'text-black' : 'text-white'} ${item.checked ? 'block' : 'hidden'}`} />
                                     </div>
-                                    <p className={`${theme.signoff} font-mono text-sm tracking-widest uppercase`}>Checklist</p>
-                                </div>
-                            </div>
-                            <div className={`sticky top-0 z-30 ${theme.bg} pb-6 pt-2 mb-2 border-b ${theme.border}`}>
-                                <div className={`flex justify-between text-xs font-mono mb-2 uppercase tracking-wider ${theme.signoff}`}>
-                                    <span>{progress === 100 ? "Ready!" : "Readiness"}</span>
-                                    <span>{progress}%</span>
-                                </div>
-                                <div className={`h-1 ${theme.progressBg} rounded-full overflow-hidden`}><div className={`h-full ${theme.progressFill} transition-all duration-500 ease-out`} style={{ width: `${progress}%` }}></div></div>
-                            </div>
-                            <div className="space-y-3 py-4 flex-1">
-                                {items.map(item => (
-                                    <label key={item.id} className={`group flex items-center p-4 border rounded-xl cursor-pointer transition-all ${theme.checkBg} ${theme.border} hover:shadow-sm`}>
-                                        <input type="checkbox" className="hidden custom-checkbox" checked={item.checked} onChange={() => toggleItem(item.id)} />
-                                        <div className={`w-6 h-6 border-2 rounded-md flex items-center justify-center mr-4 transition-colors ${theme.checkBorder} ${item.checked ? theme.checkFill : ''}`}>
-                                            <Icons.Check className={`w-4 h-4 ${data.theme === 'dark' || data.theme === 'charcoal' ? 'text-black' : 'text-white'} ${item.checked ? 'block' : 'hidden'}`} />
-                                        </div>
-                                        <span className={`text-lg font-light tracking-wide transition-opacity ${item.checked ? theme.checkedText : theme.text}`}>{item.text}</span>
-                                    </label>
-                                ))}
-                            </div>
-                            {data.footer && <div className="mt-8 text-center pb-8"><p className={`${theme.signoff} text-xs font-mono uppercase tracking-[0.2em]`}>{data.footer}</p></div>}
+                                    <span className={`text-lg font-light tracking-wide transition-opacity ${item.checked ? theme.checkedText : theme.text}`}>{item.text}</span>
+                                </label>
+                            ))}
                         </div>
-                    )}
+
+                        <div className="mt-8 text-center pb-8 flex flex-col items-center">
+                            {data.footer && <p className={`${theme.signoff} text-xs font-mono uppercase tracking-[0.2em] mb-6`}>{data.footer}</p>}
+                            {hasMessage && (
+                                <button onClick={() => setShowMessage(!showMessage)} className="p-2 outline-none">
+                                    <Icons.Heart className={`w-5 h-5 ${theme.iconColor} opacity-50 hover:opacity-100 transition-opacity cursor-pointer`} />
+                                </button>
+                            )}
+                        </div>
+                    </div>
                 </div>
             );
         };
@@ -372,13 +364,25 @@
             const [filterClicks, setFilterClicks] = useState({}); 
             
             const [view, setView] = useState('timeline'); 
-            const [directoryTab, setDirectoryTab] = useState('responsible'); // 'responsible' | 'vendors'
+            const [directoryTab, setDirectoryTab] = useState('responsible');
             const [mapZoom, setMapZoom] = useState(false);
+            const [isScrolled, setIsScrolled] = useState(false);
 
+            const timelineScrollRef = useRef(null); 
             const activeRef = useRef(null); 
             const weddingDate = new Date(CONFIG.weddingDate);
 
             useEffect(() => { const timer = setInterval(() => setCurrentTime(new Date()), 60000); return () => clearInterval(timer); }, []);
+
+            // Fix for Sticky Scrolling (Listens to the container, not the window)
+            useEffect(() => {
+                const el = timelineScrollRef.current;
+                const handleScroll = () => {
+                    if (el) setIsScrolled(el.scrollTop > 80);
+                };
+                if (el) el.addEventListener('scroll', handleScroll);
+                return () => { if (el) el.removeEventListener('scroll', handleScroll); }
+            }, [view]);
 
             useEffect(() => {
                 const updateCountdown = () => {
@@ -413,6 +417,10 @@
                 }
             };
 
+            const scrollToTop = () => {
+                if (timelineScrollRef.current) timelineScrollRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+            };
+
             const parseEventTime = (timeStr) => {
                 const [time, period] = timeStr.split(' ');
                 let [hours, minutes] = time.split(':').map(Number);
@@ -421,7 +429,7 @@
                 return hours * 60 + minutes; 
             };
 
-            const isWeddingDay = true; // Force for testing
+            const isWeddingDay = true; // Force true for testing highlight
             const currentMinutes = currentTime.getHours() * 60 + currentTime.getMinutes();
 
             const getEventStatus = (eventTimeStr, nextEventTimeStr) => {
@@ -477,34 +485,38 @@
             if (!isWeddingDay && filteredEvents.length > 0) currentEventId = filteredEvents[0].id;
 
             useEffect(() => {
-                window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+                if (timelineScrollRef.current) timelineScrollRef.current.scrollTo({ top: 0, left: 0, behavior: 'instant' });
                 if (activeRef.current && view === 'timeline') {
                     setTimeout(() => activeRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' }), 500); 
                 }
             }, [view]);
 
             const toggleFilter = (filterId) => {
+                // Multi-select toggle logic
+                if (filterId === 'all') { 
+                    setSelectedFilters(['all']); 
+                } else {
+                    setSelectedFilters(prev => {
+                        const clean = prev.filter(f => f !== 'all');
+                        if (clean.includes(filterId)) { 
+                            const updated = clean.filter(f => f !== filterId); 
+                            return updated.length === 0 ? ['all'] : updated; 
+                        } else { 
+                            return [...clean, filterId]; 
+                        }
+                    });
+                }
+
+                // Easter Egg Triple Click Logic runs in parallel
                 if (CONFIG.checklists[filterId]) {
                     const clicks = (filterClicks[filterId] || 0) + 1;
-                    if (clicks === 1 && !selectedFilters.includes(filterId)) {
-                        setSelectedFilters([filterId]); 
-                        setFilterClicks({ [filterId]: 1 });
-                    } else if (clicks >= 3) {
+                    setFilterClicks({ ...filterClicks, [filterId]: clicks });
+                    if (clicks >= 3) {
                         setActiveChecklist(filterId);
-                        setFilterClicks({});
-                    } else {
-                        setFilterClicks({ [filterId]: clicks });
+                        setFilterClicks({}); // reset
                     }
-                    return; 
-                }
-                setFilterClicks({});
-                if (filterId === 'all') { setSelectedFilters(['all']); } 
-                else {
-                    setSelectedFilters(prev => {
-                        const cleanPrev = prev.filter(f => f !== 'all');
-                        if (prev.includes(filterId)) { const newFilters = cleanPrev.filter(f => f !== filterId); return newFilters.length === 0 ? ['all'] : newFilters; } 
-                        else { return [...cleanPrev, filterId]; }
-                    });
+                } else {
+                    setFilterClicks({});
                 }
             };
 
@@ -538,7 +550,7 @@
                     </div>
 
                     {/* --- SLIDING CONTAINER --- */}
-                    <div className={`flex ${layoutWidth} transition-transform duration-500 ease-in-out`} style={{ transform: `translateX(-${translation}%)` }}>
+                    <div className={`flex ${layoutWidth} transition-transform duration-500 ease-in-out h-screen`} style={{ transform: `translateX(-${translation}%)` }}>
                         
                         {/* --- VIEW 1: MAP --- */}
                         {CONFIG.enableMapScreen && (
@@ -554,14 +566,14 @@
                         )}
 
                         {/* --- VIEW 2: TIMELINE --- */}
-                        <div className={`${panelWidth} shrink-0 relative z-20 min-h-screen bg-stone-50 flex flex-col`}>
+                        <div ref={timelineScrollRef} className={`${panelWidth} shrink-0 relative z-20 h-screen overflow-y-auto bg-stone-50 flex flex-col`}>
                             
-                            {/* STICKY HEADER (Names + Filters) */}
-                            <div className="sticky top-0 z-50 w-full shadow-sm bg-white/95 backdrop-blur border-b border-stone-200" onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd}>
+                            {/* TRUE STICKY HEADER */}
+                            <div className="sticky top-0 z-50 w-full bg-white/95 backdrop-blur shadow-sm border-b border-stone-200" onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd}>
                                 <div className="w-full flex justify-center pt-3 md:hidden"><div className="w-12 h-1.5 bg-stone-200 rounded-full"></div></div>
                                 
-                                {/* Header Info */}
-                                <header className="max-w-4xl mx-auto px-4 py-6 pb-2 pt-4 text-center select-none">
+                                {/* Header Info (Scrolls away) */}
+                                <header className={`max-w-4xl mx-auto px-4 overflow-hidden transition-all duration-300 select-none flex flex-col items-center justify-center ${isScrolled ? 'max-h-0 opacity-0' : 'max-h-64 opacity-100 py-6 pt-4'}`}>
                                     <h1 className="text-4xl font-serif text-black mb-2">{CONFIG.coupleNames}</h1>
                                     <p className="text-stone-600 font-light tracking-wide">{CONFIG.displayDate}</p>
                                     <p className="text-stone-400 font-light text-sm mt-1">{CONFIG.weddingLocation}</p>
@@ -581,16 +593,19 @@
                                     )}
                                 </header>
 
-                                {/* Filter Bar */}
+                                {/* Filter Bar (Always visible) */}
                                 <div className="max-w-4xl mx-auto px-4 w-full">
-                                    <div className="flex items-center justify-between w-full pb-4">
-                                        <button onClick={() => window.scrollTo({top:0, behavior:'smooth'})} className="py-2 pr-4 pl-2 text-stone-400 hover:text-black">
+                                    <div className={`flex items-center justify-between w-full transition-all duration-300 ${isScrolled ? 'pb-4 pt-2' : 'pb-4'}`}>
+                                        
+                                        <button onClick={scrollToTop} className={`py-2 pr-4 pl-2 text-stone-400 hover:text-black transition-opacity duration-300 md:hidden ${isScrolled ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
                                             <Icons.ArrowUp className="w-5 h-5" />
                                         </button>
-                                        <button onClick={() => setShowFilters(!showFilters)} className="py-2 flex-1 flex items-center justify-center gap-2 text-stone-600 hover:text-black">
+
+                                        <button onClick={() => { if(isScrolled) scrollToTop(); setShowFilters(!showFilters); }} className="py-2 flex-1 flex items-center justify-center gap-2 text-stone-600 hover:text-black transition-colors">
                                             <Icons.Search className="w-4 h-4" /><span className="font-serif text-sm uppercase tracking-wider">Search & Filters</span>
                                             {showFilters ? <Icons.ChevronUp className="w-4 h-4" /> : <Icons.ChevronDown className="w-4 h-4" />}
                                         </button>
+                                        
                                         <div className="w-px h-6 bg-stone-200 mx-2"></div>
                                         <button onClick={() => setShowLinks(true)} className="py-2 flex items-center gap-2 text-stone-600 hover:text-black pl-2">
                                             <Icons.Info className="w-5 h-5" />
@@ -629,13 +644,13 @@
                                             const isFirstActive = event.id === currentEventId;
 
                                             return (
-                                                <div key={event.id} ref={isFirstActive ? activeRef : null} className={`relative transition-all duration-500 ease-in-out pl-28 ${isExpanded ? 'py-2 z-20' : ''} ${isPast ? 'opacity-60 grayscale' : ''}`}>
-                                                    <div className={`absolute left-0 w-24 flex justify-center mt-1 z-10 transition-all duration-500`}>
-                                                        <div className={`px-3 py-1.5 rounded-lg shadow-sm text-sm font-medium tracking-wide transition-all duration-500 ${isPast ? 'bg-stone-200 text-stone-500' : isNow ? 'bg-black text-white scale-110 shadow-md' : activeTheme.accent}`}>
+                                                <div key={event.id} ref={isFirstActive ? activeRef : null} className={`relative transition-all duration-500 ease-in-out ${isExpanded ? 'flex flex-col items-center z-20 py-2' : 'pl-28'} ${isPast ? 'opacity-60 grayscale' : ''}`}>
+                                                    <div className={`transition-all duration-500 ease-in-out z-10 ${isExpanded ? 'relative mb-3' : 'absolute left-0 w-24 flex justify-center mt-1'}`}>
+                                                        <div className={`px-3 py-1.5 rounded-lg shadow-sm text-sm font-medium tracking-wide transition-all duration-500 ${isPast ? 'bg-stone-200 text-stone-500' : isNow && !isExpanded ? 'bg-black text-white shadow-md' : activeTheme.accent}`}>
                                                             {event.time}
                                                         </div>
                                                     </div>
-                                                    <div className={`bg-white rounded-xl border overflow-hidden transition-all duration-500 ease-in-out ${isExpanded ? 'w-[100%] sm:w-[95%] shadow-xl relative z-20 border-stone-300' : 'w-full shadow-sm hover:shadow-md border-stone-200'}`}>
+                                                    <div className={`bg-white rounded-xl border overflow-hidden transition-all duration-500 ease-in-out w-full ${isExpanded ? 'shadow-xl relative z-20 border-stone-300' : 'shadow-sm hover:shadow-md border-stone-200'} ${isNow && !isExpanded ? 'shadow-md' : ''}`}>
                                                         <button onClick={() => toggleEvent(event.id)} className="w-full px-6 py-5 text-left flex items-center justify-between bg-white outline-none">
                                                             <div className="flex-1 pr-4">
                                                                 <h3 className="text-xl font-serif text-black mb-2">{event.title}</h3>
@@ -662,7 +677,7 @@
                                                                 {event.links && event.links.length > 0 && (
                                                                     <div className="mt-4 space-y-2">
                                                                         {event.links.map((link, idx) => (
-                                                                            <a key={idx} href={link.url} target="_blank" rel="noopener noreferrer" className={`inline-flex items-center gap-2 ${activeTheme.accentText} text-sm underline-offset-4 hover:underline transition-colors`}><Icons.ExternalLink className="w-4 h-4" />{link.text}</a>
+                                                                            <a key={idx} href={link.url} target="_blank" rel="noopener noreferrer" className={`inline-flex items-center gap-2 text-black text-sm underline-offset-4 hover:underline transition-colors`}><Icons.ExternalLink className="w-4 h-4" />{link.text}</a>
                                                                         ))}
                                                                     </div>
                                                                 )}
@@ -686,7 +701,7 @@
                         </div>
 
                         {/* --- VIEW 3: DIRECTORY (RIGHT) --- */}
-                        <div className={`${panelWidth} shrink-0 min-h-screen relative bg-stone-50`}>
+                        <div className={`${panelWidth} shrink-0 h-screen overflow-y-auto relative bg-stone-50 flex flex-col`}>
                             <div className="bg-white/95 backdrop-blur border-b border-stone-200 sticky top-0 z-50" onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd}>
                                 <div className="w-full flex justify-center pt-3 md:hidden"><div className="w-12 h-1.5 bg-stone-200 rounded-full"></div></div>
                                 <div className="max-w-3xl mx-auto px-6 py-6 pt-4 text-center select-none relative">
@@ -697,12 +712,12 @@
                                     <p className="text-stone-500 text-sm font-light">Key contacts for the big day.</p>
                                 </div>
                                 <div className="max-w-3xl mx-auto flex justify-center pb-4 space-x-2">
-                                    <button onClick={() => setDirectoryTab('responsible')} className={`px-4 py-2 font-serif text-sm transition-colors ${directoryTab === 'responsible' ? 'border-b-2 border-black text-black' : 'text-stone-400 hover:text-stone-600'}`}>Responsible</button>
+                                    <button onClick={() => setDirectoryTab('responsible')} className={`px-4 py-2 font-serif text-sm transition-colors ${directoryTab === 'responsible' ? 'border-b-2 border-black text-black' : 'text-stone-400 hover:text-stone-600'}`}>Responsible People</button>
                                     <button onClick={() => setDirectoryTab('vendors')} className={`px-4 py-2 font-serif text-sm transition-colors ${directoryTab === 'vendors' ? 'border-b-2 border-black text-black' : 'text-stone-400 hover:text-stone-600'}`}>Vendors</button>
                                 </div>
                             </div>
 
-                            <div className="max-w-3xl mx-auto px-4 py-8">
+                            <div className="max-w-3xl mx-auto w-full px-4 py-8 flex-1">
                                 {directoryTab === 'responsible' && (
                                     <div className="bg-white rounded-2xl shadow-sm border border-stone-200 overflow-hidden animate-in fade-in zoom-in-95 duration-300">
                                         <div className="divide-y divide-stone-100">
@@ -743,7 +758,6 @@
                                         </div>
                                     </div>
                                 )}
-
                                 <div className="mt-12 text-center pb-12"><button onClick={() => setView('timeline')} className="text-stone-500 hover:text-black text-sm flex items-center justify-center gap-2 mx-auto transition-colors"><Icons.ArrowLeft className="w-4 h-4" />Back to Timeline</button></div>
                             </div>
                         </div>
