@@ -48,7 +48,7 @@
         // ============================================================================
         const CONFIG = {
             coupleNames: "Bride & Groom",
-            weddingDate: "2026-08-28T00:00:00", // YYYY-MM-DD
+            weddingDate: "2026-08-28T00:00:00", 
             displayDate: "August 28, 2026",
             weddingLocation: "Sydney, Australia",
             pinCode: "2808",
@@ -375,7 +375,7 @@
 
                         <div className="mt-8 text-center pb-8 flex flex-col items-center">
                             {data.footer && <p className={`${theme.signoff} text-xs font-mono uppercase tracking-[0.2em] mb-6`}>{data.footer}</p>}
-                            {/* The Secret Toggle Heart ALWAYS appears if there is a message */}
+                            {/* The Secret Toggle Heart */}
                             {hasMessage && (
                                 <button onClick={() => setShowMessage(!showMessage)} className="p-2 outline-none mt-2">
                                     <Icons.Heart className={`w-6 h-6 ${theme.iconColor} ${showMessage ? 'opacity-100' : 'opacity-40'} hover:opacity-100 transition-opacity cursor-pointer`} />
@@ -398,10 +398,10 @@
             const [showFilters, setShowFilters] = useState(false);
             const [showLinks, setShowLinks] = useState(false);
             const [activeChecklist, setActiveChecklist] = useState(null); 
-            const [filterClicks, setFilterClicks] = useState({}); 
+            const [filterClicks, setFilterClicks] = useState({ id: null, count: 0 }); 
             
             const [view, setView] = useState('timeline'); 
-            const [directoryTab, setDirectoryTab] = useState('vendors');
+            const [directoryTab, setDirectoryTab] = useState('vendors'); 
             const [mapZoom, setMapZoom] = useState(false);
             const [isScrolled, setIsScrolled] = useState(false);
 
@@ -527,31 +527,41 @@
             }, [view]);
 
             const toggleFilter = (filterId) => {
-                // Multi-select toggle logic
+                // Determine clicks for Easter Egg
+                let clicks = 1;
+                if (filterClicks.id === filterId) {
+                    clicks = filterClicks.count + 1;
+                }
+                setFilterClicks({ id: filterId, count: clicks });
+
+                // Easter Egg Triple Click Logic
+                if (CONFIG.checklists[filterId] && clicks >= 3) {
+                    setActiveChecklist(filterId);
+                    setFilterClicks({ id: null, count: 0 }); // reset
+                    return; 
+                }
+
+                // Standard Multi-Select
                 if (filterId === 'all') { 
                     setSelectedFilters(['all']); 
+                    setFilterClicks({ id: null, count: 0 });
                 } else {
                     setSelectedFilters(prev => {
                         const clean = prev.filter(f => f !== 'all');
-                        if (clean.includes(filterId)) { 
+                        const isSelected = clean.includes(filterId);
+
+                        if (isSelected) { 
+                            // If it's a checklist filter and this is the 2nd click, DO NOT unselect
+                            if (CONFIG.checklists[filterId] && clicks === 2) {
+                                return prev;
+                            }
+                            // Otherwise, normal unselect
                             const updated = clean.filter(f => f !== filterId); 
                             return updated.length === 0 ? ['all'] : updated; 
                         } else { 
                             return [...clean, filterId]; 
                         }
                     });
-                }
-
-                // Easter Egg Triple Click Logic runs in parallel
-                if (CONFIG.checklists[filterId]) {
-                    const clicks = (filterClicks[filterId] || 0) + 1;
-                    setFilterClicks({ ...filterClicks, [filterId]: clicks });
-                    if (clicks >= 3) {
-                        setActiveChecklist(filterId);
-                        setFilterClicks({}); // reset
-                    }
-                } else {
-                    setFilterClicks({});
                 }
             };
 
@@ -675,6 +685,7 @@
                                             const isExpanded = expandAll || expandedEvents.includes(event.id);
                                             const status = getEventStatus(event.time, filteredEvents[index+1]?.time);
                                             const isPast = status === 'past';
+                                            const isNow = status === 'now';
                                             const isFirstActive = event.id === currentEventId;
 
                                             return (
@@ -682,7 +693,7 @@
                                                     
                                                     {/* The Time Badge */}
                                                     <div className={`transition-all duration-500 ease-in-out z-10 flex ${isExpanded ? 'w-full justify-center mb-3 relative' : 'absolute left-0 w-24 justify-center mt-1'}`}>
-                                                        <div className={`px-3 py-1.5 rounded-lg shadow-sm text-sm font-medium tracking-wide transition-all duration-500 ${isPast ? 'bg-stone-200 text-stone-500' : activeTheme.accent}`}>
+                                                        <div className={`px-3 py-1.5 rounded-lg shadow-sm text-sm font-medium tracking-wide transition-all duration-500 ${isPast ? 'bg-stone-200 text-stone-500' : isNow && !isExpanded ? 'bg-black text-white shadow-md scale-105' : activeTheme.accent}`}>
                                                             {event.time}
                                                         </div>
                                                     </div>
