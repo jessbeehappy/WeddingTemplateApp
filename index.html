@@ -48,7 +48,7 @@
         // ============================================================================
         const CONFIG = {
             coupleNames: "Bride & Groom",
-            weddingDate: "2026-08-28T00:00:00", 
+            weddingDate: "2026-08-28T00:00:00", // YYYY-MM-DD
             displayDate: "August 28, 2026",
             weddingLocation: "Sydney, Australia",
             pinCode: "2808",
@@ -193,11 +193,12 @@
         };
         const activeTheme = THEMES[CONFIG.theme] || THEMES.classic;
 
+        // Refined modal styling for checked items for improved legibility
         const MODAL_THEMES = {
-            ivory: { bg: 'bg-[#faf9f6]', text: 'text-stone-600', title: 'text-stone-800', btn: 'bg-white hover:bg-stone-100 text-stone-800 border border-stone-200', iconBg: 'bg-white shadow-sm', iconColor: 'text-rose-400 fill-rose-50', signoff: 'text-stone-400', border: 'border-stone-200', checkBg: 'bg-white', checkBorder: 'border-stone-200 group-hover:border-stone-300', checkFill: 'bg-stone-800 border-stone-800 text-white', checkedText: 'opacity-40 line-through decoration-stone-300', progressBg: 'bg-stone-200', progressFill: 'bg-stone-800' },
-            blush: { bg: 'bg-[#fffafa]', text: 'text-[#8a7a7a]', title: 'text-[#5a4a4a]', btn: 'bg-[#fcf5f5] hover:bg-[#f5ebeb] text-[#8a7a7a] border border-[#f5ebeb]', iconBg: 'bg-white', iconColor: 'text-[#e8d5d5] fill-[#fcf5f5]', signoff: 'text-[#c2afaf]', border: 'border-[#f5ebeb]', checkBg: 'bg-white/80', checkBorder: 'border-[#e8d5d5] group-hover:border-[#d9c1c1]', checkFill: 'bg-[#bca0a0] border-[#bca0a0] text-white', checkedText: 'opacity-50 line-through decoration-[#bca0a0]', progressBg: 'bg-[#f5ebeb]', progressFill: 'bg-[#bca0a0]' },
-            dark: { bg: 'bg-stone-950', text: 'text-stone-300', title: 'text-white', btn: 'bg-stone-800 hover:bg-stone-700 text-white', iconBg: 'bg-stone-900', iconColor: 'text-stone-600 fill-stone-800', signoff: 'text-stone-500', border: 'border-stone-800', checkBg: 'bg-stone-900/50', checkBorder: 'border-stone-700 group-hover:border-stone-500', checkFill: 'bg-white border-white text-black', checkedText: 'opacity-30 line-through decoration-stone-600', progressBg: 'bg-stone-900', progressFill: 'bg-stone-300' },
-            charcoal: { bg: 'bg-[#1c1c1e]', text: 'text-[#a1a1aa]', title: 'text-white', btn: 'bg-[#27272a] hover:bg-[#3f3f46] text-white', iconBg: 'bg-[#27272a]', iconColor: 'text-[#52525b] fill-[#18181b]', signoff: 'text-[#71717a]', border: 'border-[#27272a]', checkBg: 'bg-[#27272a]/50', checkBorder: 'border-[#3f3f46] group-hover:border-[#52525b]', checkFill: 'bg-white border-white text-black', checkedText: 'opacity-40 line-through decoration-[#71717a]', progressBg: 'bg-[#27272a]', progressFill: 'bg-[#a1a1aa]' }
+            ivory: { bg: 'bg-[#faf9f6]', text: 'text-stone-600', title: 'text-stone-800', btn: 'bg-white hover:bg-stone-100 text-stone-800 border border-stone-200', iconBg: 'bg-white shadow-sm', iconColor: 'text-rose-400 fill-rose-50', signoff: 'text-stone-400', border: 'border-stone-200', checkBg: 'bg-white', checkBorder: 'border-stone-200 group-hover:border-stone-300', checkFill: 'bg-stone-300 border-stone-300', checkedText: 'text-stone-400 line-through', progressBg: 'bg-stone-200', progressFill: 'bg-stone-800' },
+            blush: { bg: 'bg-[#fffafa]', text: 'text-[#8a7a7a]', title: 'text-[#5a4a4a]', btn: 'bg-[#fcf5f5] hover:bg-[#f5ebeb] text-[#8a7a7a] border border-[#f5ebeb]', iconBg: 'bg-white', iconColor: 'text-[#e8d5d5] fill-[#fcf5f5]', signoff: 'text-[#c2afaf]', border: 'border-[#f5ebeb]', checkBg: 'bg-white/80', checkBorder: 'border-[#e8d5d5] group-hover:border-[#d9c1c1]', checkFill: 'bg-[#d9c1c1] border-[#d9c1c1]', checkedText: 'text-[#c2afaf] line-through', progressBg: 'bg-[#f5ebeb]', progressFill: 'bg-[#bca0a0]' },
+            dark: { bg: 'bg-stone-950', text: 'text-stone-300', title: 'text-white', btn: 'bg-stone-800 hover:bg-stone-700 text-white', iconBg: 'bg-stone-900', iconColor: 'text-stone-600 fill-stone-800', signoff: 'text-stone-500', border: 'border-stone-800', checkBg: 'bg-stone-900/50', checkBorder: 'border-stone-700 group-hover:border-stone-500', checkFill: 'bg-stone-700 border-stone-700', checkedText: 'text-stone-600 line-through', progressBg: 'bg-stone-900', progressFill: 'bg-stone-300' },
+            charcoal: { bg: 'bg-[#1c1c1e]', text: 'text-[#a1a1aa]', title: 'text-white', btn: 'bg-[#27272a] hover:bg-[#3f3f46] text-white', iconBg: 'bg-[#27272a]', iconColor: 'text-[#52525b] fill-[#18181b]', signoff: 'text-[#71717a]', border: 'border-[#27272a]', checkBg: 'bg-[#27272a]/50', checkBorder: 'border-[#3f3f46] group-hover:border-[#52525b]', checkFill: 'bg-[#3f3f46] border-[#3f3f46]', checkedText: 'text-[#52525b] line-through', progressBg: 'bg-[#27272a]', progressFill: 'bg-[#a1a1aa]' }
         };
 
         const Icons = {
@@ -318,11 +319,9 @@
         const ChecklistModal = ({ data, onClose }) => {
             const theme = MODAL_THEMES[data.theme] || MODAL_THEMES.ivory;
             
-            // Logic to determine if message should be shown
             const isWeddingDayToday = new Date().toDateString() === new Date(CONFIG.weddingDate).toDateString();
             const hasMessage = data.messageLines && data.messageLines.length > 0;
             
-            // Show message by default only if it's the actual wedding day
             const [showMessage, setShowMessage] = useState(hasMessage && isWeddingDayToday);
             
             const initialItems = data.items ? data.items.map((item, idx) => ({ id: idx, text: item, checked: false })) : [];
@@ -344,14 +343,16 @@
                         </div>
 
                         {/* Hidden Message that expands ABOVE checklist */}
-                        {hasMessage && showMessage && (
-                            <div className={`mb-8 p-6 ${theme.checkBg} rounded-xl border ${theme.border} text-center animate-in fade-in slide-in-from-top-4`}>
-                                <Icons.Heart className={`w-8 h-8 mx-auto mb-4 ${theme.iconColor}`} />
-                                <div className={`space-y-4 font-light text-lg leading-relaxed ${theme.text}`}>
-                                    {data.messageLines.map((line, i) => (<p key={i} className={i === 0 ? `text-2xl font-serif italic ${theme.title}` : ""}>{line}</p>))}
+                        <div className={`overflow-hidden transition-all duration-500 ease-in-out ${showMessage ? 'max-h-[1000px] opacity-100 mb-8' : 'max-h-0 opacity-0 mb-0'}`}>
+                            {hasMessage && (
+                                <div className={`p-6 ${theme.checkBg} rounded-xl border ${theme.border} text-center`}>
+                                    <Icons.Heart className={`w-8 h-8 mx-auto mb-4 ${theme.iconColor}`} />
+                                    <div className={`space-y-4 font-light text-lg leading-relaxed ${theme.text}`}>
+                                        {data.messageLines.map((line, i) => (<p key={i} className={i === 0 ? `text-2xl font-serif italic ${theme.title}` : ""}>{line}</p>))}
+                                    </div>
                                 </div>
-                            </div>
-                        )}
+                            )}
+                        </div>
 
                         <div className={`sticky top-0 z-30 ${theme.bg} pb-6 pt-2 mb-2 border-b ${theme.border}`}>
                             <div className={`flex justify-between text-xs font-mono mb-2 uppercase tracking-wider ${theme.signoff}`}>
@@ -366,7 +367,7 @@
                                 <label key={item.id} className={`group flex items-center p-4 border rounded-xl cursor-pointer transition-all ${theme.checkBg} ${theme.border} hover:shadow-sm`}>
                                     <input type="checkbox" className="hidden custom-checkbox" checked={item.checked} onChange={() => toggleItem(item.id)} />
                                     <div className={`w-6 h-6 border-2 rounded-md flex items-center justify-center mr-4 transition-colors ${theme.checkBorder} ${item.checked ? theme.checkFill : ''}`}>
-                                        <Icons.Check className={`w-4 h-4 ${data.theme === 'dark' || data.theme === 'charcoal' ? 'text-black' : 'text-white'} ${item.checked ? 'block' : 'hidden'}`} />
+                                        <Icons.Check className={`w-4 h-4 text-white ${item.checked ? 'block' : 'hidden'}`} />
                                     </div>
                                     <span className={`text-lg font-light tracking-wide transition-opacity ${item.checked ? theme.checkedText : theme.text}`}>{item.text}</span>
                                 </label>
@@ -375,7 +376,6 @@
 
                         <div className="mt-8 text-center pb-8 flex flex-col items-center">
                             {data.footer && <p className={`${theme.signoff} text-xs font-mono uppercase tracking-[0.2em] mb-6`}>{data.footer}</p>}
-                            {/* The Secret Toggle Heart */}
                             {hasMessage && (
                                 <button onClick={() => setShowMessage(!showMessage)} className="p-2 outline-none mt-2">
                                     <Icons.Heart className={`w-6 h-6 ${theme.iconColor} ${showMessage ? 'opacity-100' : 'opacity-40'} hover:opacity-100 transition-opacity cursor-pointer`} />
@@ -398,18 +398,16 @@
             const [showFilters, setShowFilters] = useState(false);
             const [showLinks, setShowLinks] = useState(false);
             const [activeChecklist, setActiveChecklist] = useState(null); 
-            const [filterClicks, setFilterClicks] = useState({ id: null, count: 0 }); 
+            const [filterClicks, setFilterClicks] = useState({}); 
             
             const [view, setView] = useState('timeline'); 
-            const [directoryTab, setDirectoryTab] = useState('vendors'); 
+            const [directoryTab, setDirectoryTab] = useState('vendors');
             const [mapZoom, setMapZoom] = useState(false);
             const [isScrolled, setIsScrolled] = useState(false);
 
             const timelineScrollRef = useRef(null); 
             const activeRef = useRef(null); 
             const weddingDate = new Date(CONFIG.weddingDate);
-
-            useEffect(() => { const timer = setInterval(() => setCurrentTime(new Date()), 60000); return () => clearInterval(timer); }, []);
 
             // Fix for Sticky Scrolling 
             useEffect(() => {
@@ -418,6 +416,8 @@
                 if (el) el.addEventListener('scroll', handleScroll);
                 return () => { if (el) el.removeEventListener('scroll', handleScroll); }
             }, [view]);
+
+            useEffect(() => { const timer = setInterval(() => setCurrentTime(new Date()), 60000); return () => clearInterval(timer); }, []);
 
             useEffect(() => {
                 const updateCountdown = () => {
@@ -464,7 +464,7 @@
                 return hours * 60 + minutes; 
             };
 
-            const isWeddingDay = true; // Force true for testing highlight
+            const isWeddingDay = true; // Force true for testing
             const currentMinutes = currentTime.getHours() * 60 + currentTime.getMinutes();
 
             const getEventStatus = (eventTimeStr, nextEventTimeStr) => {
@@ -527,21 +527,18 @@
             }, [view]);
 
             const toggleFilter = (filterId) => {
-                // Determine clicks for Easter Egg
                 let clicks = 1;
                 if (filterClicks.id === filterId) {
                     clicks = filterClicks.count + 1;
                 }
                 setFilterClicks({ id: filterId, count: clicks });
 
-                // Easter Egg Triple Click Logic
                 if (CONFIG.checklists[filterId] && clicks >= 3) {
                     setActiveChecklist(filterId);
                     setFilterClicks({ id: null, count: 0 }); // reset
                     return; 
                 }
 
-                // Standard Multi-Select
                 if (filterId === 'all') { 
                     setSelectedFilters(['all']); 
                     setFilterClicks({ id: null, count: 0 });
@@ -551,11 +548,9 @@
                         const isSelected = clean.includes(filterId);
 
                         if (isSelected) { 
-                            // If it's a checklist filter and this is the 2nd click, DO NOT unselect
                             if (CONFIG.checklists[filterId] && clicks === 2) {
                                 return prev;
                             }
-                            // Otherwise, normal unselect
                             const updated = clean.filter(f => f !== filterId); 
                             return updated.length === 0 ? ['all'] : updated; 
                         } else { 
@@ -595,11 +590,11 @@
                     </div>
 
                     {/* --- SLIDING CONTAINER --- */}
-                    <div className={`flex ${layoutWidth} transition-transform duration-500 ease-in-out h-screen`} style={{ transform: `translateX(-${translation}%)` }}>
+                    <div className={`flex ${layoutWidth} transition-transform duration-500 ease-in-out h-[100dvh]`} style={{ transform: `translateX(-${translation}%)` }}>
                         
                         {/* --- VIEW 1: MAP --- */}
                         {CONFIG.enableMapScreen && (
-                            <div className={`${panelWidth} shrink-0 h-screen relative bg-stone-200 flex flex-col`}>
+                            <div className={`${panelWidth} shrink-0 h-[100dvh] relative bg-stone-200 flex flex-col`}>
                                 <div className="absolute top-6 left-6 z-10"><button onClick={() => setView('timeline')} className="bg-white/90 p-3 rounded-full shadow-md"><Icons.ArrowRight className="w-6 h-6 text-stone-600" /></button></div>
                                 <div onClick={() => setMapZoom(!mapZoom)} className={`flex-1 relative overflow-hidden flex items-center justify-center cursor-zoom-in ${mapZoom ? 'cursor-grab active:cursor-grabbing' : ''}`}>
                                     <div className={`transition-all duration-300 w-full h-full ${mapZoom ? 'overflow-auto no-scrollbar' : 'overflow-hidden flex items-center justify-center'}`}>
@@ -611,14 +606,13 @@
                         )}
 
                         {/* --- VIEW 2: TIMELINE --- */}
-                        <div ref={timelineScrollRef} className={`${panelWidth} shrink-0 relative z-20 h-screen overflow-y-auto bg-stone-50 flex flex-col`}>
+                        <div ref={timelineScrollRef} onScroll={handleTimelineScroll} className={`${panelWidth} shrink-0 relative z-20 h-[100dvh] overflow-y-auto bg-stone-50 flex flex-col`}>
                             
                             {/* TRUE STICKY HEADER */}
-                            <div className="sticky top-0 z-50 w-full bg-white/95 backdrop-blur shadow-sm border-b border-stone-200" onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd}>
+                            <div className="sticky top-0 z-50 w-full bg-white/95 backdrop-blur shadow-sm border-b border-stone-200 shrink-0" onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd}>
                                 <div className="w-full flex justify-center pt-3 md:hidden"><div className="w-12 h-1.5 bg-stone-200 rounded-full"></div></div>
                                 
-                                {/* Header Info (Scrolls away) */}
-                                <header className={`max-w-4xl mx-auto px-4 overflow-hidden transition-all duration-300 select-none flex flex-col items-center justify-center ${isScrolled ? 'max-h-0 opacity-0' : 'max-h-64 opacity-100 py-6 pt-4'}`}>
+                                <div className={`max-w-4xl mx-auto px-4 overflow-hidden transition-all duration-300 select-none flex flex-col items-center justify-center ${isScrolled ? 'max-h-0 opacity-0 m-0 p-0' : 'max-h-64 opacity-100 py-6 pt-4'}`}>
                                     <h1 className="text-4xl font-serif text-black mb-2">{CONFIG.coupleNames}</h1>
                                     <p className="text-stone-600 font-light tracking-wide">{CONFIG.displayDate}</p>
                                     <p className="text-stone-400 font-light text-sm mt-1">{CONFIG.weddingLocation}</p>
@@ -636,9 +630,8 @@
                                     ) : (
                                         <div className="mt-4"><p className="text-sm text-stone-500">The big day has arrived!</p></div>
                                     )}
-                                </header>
+                                </div>
 
-                                {/* Filter Bar (Always visible) */}
                                 <div className="max-w-4xl mx-auto px-4 w-full">
                                     <div className={`flex items-center justify-between w-full transition-all duration-300 ${isScrolled ? 'pb-4 pt-2' : 'pb-4'}`}>
                                         
@@ -677,7 +670,7 @@
                             </div>
 
                             {/* SCROLLABLE TIMELINE LIST */}
-                            <div className="flex-1 overflow-y-auto w-full relative">
+                            <div className="flex-1 w-full relative">
                                 <div className="max-w-3xl mx-auto w-full px-4 py-8 pb-32 relative">
                                     <div className="absolute left-[3.25rem] top-8 bottom-32 w-px bg-stone-300"></div>
                                     <div className="space-y-4">
@@ -685,22 +678,19 @@
                                             const isExpanded = expandAll || expandedEvents.includes(event.id);
                                             const status = getEventStatus(event.time, filteredEvents[index+1]?.time);
                                             const isPast = status === 'past';
-                                            const isNow = status === 'now';
                                             const isFirstActive = event.id === currentEventId;
 
                                             return (
-                                                <div key={event.id} ref={isFirstActive ? activeRef : null} className={`relative transition-all duration-500 ease-in-out ${isExpanded ? 'py-2 z-20 px-0' : 'pl-28'} ${isPast ? 'opacity-60 grayscale' : ''}`}>
+                                                <div key={event.id} ref={isFirstActive ? activeRef : null} className={`relative transition-all duration-300 ease-in-out ${isExpanded ? 'py-4 z-20 pl-0' : 'pl-[5.5rem]'} ${isPast ? 'opacity-60 grayscale' : ''}`}>
                                                     
-                                                    {/* The Time Badge */}
-                                                    <div className={`transition-all duration-500 ease-in-out z-10 flex ${isExpanded ? 'w-full justify-center mb-3 relative' : 'absolute left-0 w-24 justify-center mt-1'}`}>
-                                                        <div className={`px-3 py-1.5 rounded-lg shadow-sm text-sm font-medium tracking-wide transition-all duration-500 ${isPast ? 'bg-stone-200 text-stone-500' : isNow && !isExpanded ? 'bg-black text-white shadow-md scale-105' : activeTheme.accent}`}>
+                                                    <div className={`transition-all duration-300 ease-in-out z-10 ${isExpanded ? 'flex w-full justify-center mb-4 relative' : 'absolute left-0 w-20 justify-center mt-1'}`}>
+                                                        <div className={`px-3 py-1.5 rounded-lg shadow-sm text-sm font-medium tracking-wide transition-all duration-500 ${isPast ? 'bg-stone-200 text-stone-500' : activeTheme.accent}`}>
                                                             {event.time}
                                                         </div>
                                                     </div>
                                                     
-                                                    {/* The Event Card */}
-                                                    <div className={`bg-white rounded-xl border overflow-hidden transition-all duration-500 ease-in-out w-full ${isExpanded ? 'shadow-xl relative z-20 border-stone-300' : 'shadow-sm hover:shadow-md border-stone-200'}`}>
-                                                        <button onClick={() => toggleEvent(event.id)} className="w-full px-6 py-5 text-left flex items-center justify-between bg-white outline-none">
+                                                    <div className={`bg-white rounded-xl border transition-all duration-500 ease-in-out w-full ${isExpanded ? 'shadow-xl border-stone-300 relative z-20' : 'shadow-sm hover:shadow-md border-stone-200'}`}>
+                                                        <button onClick={() => toggleEvent(event.id)} className="w-full px-6 py-5 text-left flex items-center justify-between bg-white outline-none rounded-xl">
                                                             <div className="flex-1 pr-4">
                                                                 <h3 className="text-xl font-serif text-black mb-2">{event.title}</h3>
                                                                 <div className="flex flex-col gap-2">
@@ -749,7 +739,7 @@
                         </div>
 
                         {/* --- VIEW 3: DIRECTORY (RIGHT) --- */}
-                        <div className={`${panelWidth} shrink-0 h-screen overflow-y-auto relative bg-stone-50 flex flex-col`}>
+                        <div className={`${panelWidth} shrink-0 h-[100dvh] overflow-y-auto relative bg-stone-50 flex flex-col`}>
                             <div className="bg-white/95 backdrop-blur border-b border-stone-200 sticky top-0 z-50 shrink-0" onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd}>
                                 <div className="w-full flex justify-center pt-3 md:hidden"><div className="w-12 h-1.5 bg-stone-200 rounded-full"></div></div>
                                 <div className="max-w-3xl mx-auto px-6 py-6 pt-4 text-center select-none relative">
