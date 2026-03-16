@@ -48,7 +48,7 @@
         // ============================================================================
         const CONFIG = {
             coupleNames: "Bride & Groom",
-            weddingDate: "2026-08-28T00:00:00", 
+            weddingDate: "2026-08-28T00:00:00", // YYYY-MM-DD
             displayDate: "August 28, 2026",
             weddingLocation: "Sydney, Australia",
             pinCode: "2808",
@@ -194,7 +194,7 @@
         const activeTheme = THEMES[CONFIG.theme] || THEMES.classic;
 
         const MODAL_THEMES = {
-            ivory: { bg: 'bg-[#faf9f6]', text: 'text-stone-600', title: 'text-stone-800', btn: 'bg-white hover:bg-stone-100 text-stone-800 border border-stone-200', iconBg: 'bg-white shadow-sm', iconColor: 'text-rose-300 fill-rose-50', signoff: 'text-stone-400', border: 'border-stone-200', checkBg: 'bg-white', checkBorder: 'border-stone-200 group-hover:border-stone-300', checkFill: 'bg-stone-800 border-stone-800 text-white', checkedText: 'opacity-40 line-through decoration-stone-300', progressBg: 'bg-stone-200', progressFill: 'bg-stone-800' },
+            ivory: { bg: 'bg-[#faf9f6]', text: 'text-stone-600', title: 'text-stone-800', btn: 'bg-white hover:bg-stone-100 text-stone-800 border border-stone-200', iconBg: 'bg-white shadow-sm', iconColor: 'text-rose-400 fill-rose-50', signoff: 'text-stone-400', border: 'border-stone-200', checkBg: 'bg-white', checkBorder: 'border-stone-200 group-hover:border-stone-300', checkFill: 'bg-stone-800 border-stone-800 text-white', checkedText: 'opacity-40 line-through decoration-stone-300', progressBg: 'bg-stone-200', progressFill: 'bg-stone-800' },
             blush: { bg: 'bg-[#fffafa]', text: 'text-[#8a7a7a]', title: 'text-[#5a4a4a]', btn: 'bg-[#fcf5f5] hover:bg-[#f5ebeb] text-[#8a7a7a] border border-[#f5ebeb]', iconBg: 'bg-white', iconColor: 'text-[#e8d5d5] fill-[#fcf5f5]', signoff: 'text-[#c2afaf]', border: 'border-[#f5ebeb]', checkBg: 'bg-white/80', checkBorder: 'border-[#e8d5d5] group-hover:border-[#d9c1c1]', checkFill: 'bg-[#bca0a0] border-[#bca0a0] text-white', checkedText: 'opacity-50 line-through decoration-[#bca0a0]', progressBg: 'bg-[#f5ebeb]', progressFill: 'bg-[#bca0a0]' },
             dark: { bg: 'bg-stone-950', text: 'text-stone-300', title: 'text-white', btn: 'bg-stone-800 hover:bg-stone-700 text-white', iconBg: 'bg-stone-900', iconColor: 'text-stone-600 fill-stone-800', signoff: 'text-stone-500', border: 'border-stone-800', checkBg: 'bg-stone-900/50', checkBorder: 'border-stone-700 group-hover:border-stone-500', checkFill: 'bg-white border-white text-black', checkedText: 'opacity-30 line-through decoration-stone-600', progressBg: 'bg-stone-900', progressFill: 'bg-stone-300' },
             charcoal: { bg: 'bg-[#1c1c1e]', text: 'text-[#a1a1aa]', title: 'text-white', btn: 'bg-[#27272a] hover:bg-[#3f3f46] text-white', iconBg: 'bg-[#27272a]', iconColor: 'text-[#52525b] fill-[#18181b]', signoff: 'text-[#71717a]', border: 'border-[#27272a]', checkBg: 'bg-[#27272a]/50', checkBorder: 'border-[#3f3f46] group-hover:border-[#52525b]', checkFill: 'bg-white border-white text-black', checkedText: 'opacity-40 line-through decoration-[#71717a]', progressBg: 'bg-[#27272a]', progressFill: 'bg-[#a1a1aa]' }
@@ -291,7 +291,7 @@
                                 </li>
                                 <li className="flex gap-3 items-start">
                                     <div className="mt-0.5"><Icons.Heart className="w-4 h-4 text-rose-400" fillClass="fill-rose-100" /></div>
-                                    <span><strong>Secret Checklists:</strong> Tap a filter role (like Bride or Groomsmen) 3 times fast to unlock your hidden packing list!</span>
+                                    <span><strong>Secret Checklists:</strong> Tap a filter role (like Bride or Groomsmen) 3 times fast to unlock your hidden checklist!</span>
                                 </li>
                             </ul>
                         </div>
@@ -318,12 +318,12 @@
         const ChecklistModal = ({ data, onClose }) => {
             const theme = MODAL_THEMES[data.theme] || MODAL_THEMES.ivory;
             
-            // Logic to determine if message should be shown (Must be Wedding Day, but testable via toggle)
+            // Logic to determine if message should be shown
             const isWeddingDayToday = new Date().toDateString() === new Date(CONFIG.weddingDate).toDateString();
             const hasMessage = data.messageLines && data.messageLines.length > 0;
-            const canShowSecretFeature = hasMessage && isWeddingDayToday;
             
-            const [showMessage, setShowMessage] = useState(false);
+            // Show message by default only if it's the actual wedding day
+            const [showMessage, setShowMessage] = useState(hasMessage && isWeddingDayToday);
             
             const initialItems = data.items ? data.items.map((item, idx) => ({ id: idx, text: item, checked: false })) : [];
             const [items, setItems] = useState(initialItems);
@@ -344,7 +344,7 @@
                         </div>
 
                         {/* Hidden Message that expands ABOVE checklist */}
-                        {canShowSecretFeature && showMessage && (
+                        {hasMessage && showMessage && (
                             <div className={`mb-8 p-6 ${theme.checkBg} rounded-xl border ${theme.border} text-center animate-in fade-in slide-in-from-top-4`}>
                                 <Icons.Heart className={`w-8 h-8 mx-auto mb-4 ${theme.iconColor}`} />
                                 <div className={`space-y-4 font-light text-lg leading-relaxed ${theme.text}`}>
@@ -375,10 +375,10 @@
 
                         <div className="mt-8 text-center pb-8 flex flex-col items-center">
                             {data.footer && <p className={`${theme.signoff} text-xs font-mono uppercase tracking-[0.2em] mb-6`}>{data.footer}</p>}
-                            {/* The Secret Toggle Heart */}
-                            {canShowSecretFeature && (
+                            {/* The Secret Toggle Heart ALWAYS appears if there is a message */}
+                            {hasMessage && (
                                 <button onClick={() => setShowMessage(!showMessage)} className="p-2 outline-none mt-2">
-                                    <Icons.Heart className={`w-6 h-6 ${theme.iconColor} opacity-40 hover:opacity-100 transition-opacity cursor-pointer`} />
+                                    <Icons.Heart className={`w-6 h-6 ${theme.iconColor} ${showMessage ? 'opacity-100' : 'opacity-40'} hover:opacity-100 transition-opacity cursor-pointer`} />
                                 </button>
                             )}
                         </div>
@@ -675,7 +675,6 @@
                                             const isExpanded = expandAll || expandedEvents.includes(event.id);
                                             const status = getEventStatus(event.time, filteredEvents[index+1]?.time);
                                             const isPast = status === 'past';
-                                            const isNow = status === 'now';
                                             const isFirstActive = event.id === currentEventId;
 
                                             return (
@@ -683,13 +682,13 @@
                                                     
                                                     {/* The Time Badge */}
                                                     <div className={`transition-all duration-500 ease-in-out z-10 flex ${isExpanded ? 'w-full justify-center mb-3 relative' : 'absolute left-0 w-24 justify-center mt-1'}`}>
-                                                        <div className={`px-3 py-1.5 rounded-lg shadow-sm text-sm font-medium tracking-wide transition-all duration-500 ${isPast ? 'bg-stone-200 text-stone-500' : isNow && !isExpanded ? 'bg-black text-white shadow-md scale-105' : activeTheme.accent}`}>
+                                                        <div className={`px-3 py-1.5 rounded-lg shadow-sm text-sm font-medium tracking-wide transition-all duration-500 ${isPast ? 'bg-stone-200 text-stone-500' : activeTheme.accent}`}>
                                                             {event.time}
                                                         </div>
                                                     </div>
                                                     
                                                     {/* The Event Card */}
-                                                    <div className={`bg-white rounded-xl border overflow-hidden transition-all duration-500 ease-in-out w-full ${isExpanded ? 'shadow-xl relative z-20 border-stone-300' : 'shadow-sm hover:shadow-md border-stone-200'} ${isNow && !isExpanded ? 'shadow-md' : ''}`}>
+                                                    <div className={`bg-white rounded-xl border overflow-hidden transition-all duration-500 ease-in-out w-full ${isExpanded ? 'shadow-xl relative z-20 border-stone-300' : 'shadow-sm hover:shadow-md border-stone-200'}`}>
                                                         <button onClick={() => toggleEvent(event.id)} className="w-full px-6 py-5 text-left flex items-center justify-between bg-white outline-none">
                                                             <div className="flex-1 pr-4">
                                                                 <h3 className="text-xl font-serif text-black mb-2">{event.title}</h3>
