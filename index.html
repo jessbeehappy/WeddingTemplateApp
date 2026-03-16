@@ -266,18 +266,50 @@
 
         const HelpfulLinksModal = ({ onClose }) => (
             <div className="fixed inset-0 bg-black/60 z-[100] flex items-center justify-center p-4 animate-in fade-in">
-                <div className="bg-white rounded-2xl w-full max-w-sm overflow-hidden shadow-2xl animate-in slide-in-from-bottom-8">
-                    <div className={`${activeTheme.light} px-6 py-4 flex justify-between items-center border-b ${activeTheme.border}`}>
-                        <h3 className="font-serif text-xl text-black">Helpful Links</h3>
+                <div className="bg-white rounded-2xl w-full max-w-sm max-h-[90vh] overflow-y-auto shadow-2xl animate-in slide-in-from-bottom-8">
+                    <div className={`${activeTheme.light} px-6 py-4 flex justify-between items-center border-b ${activeTheme.border} sticky top-0 z-10`}>
+                        <h3 className="font-serif text-xl text-black">Info & Links</h3>
                         <button onClick={onClose} className="p-1 rounded-full hover:bg-black/10 transition"><Icons.X className="w-5 h-5 text-stone-600" /></button>
                     </div>
-                    <div className="p-6 space-y-3">
-                        {CONFIG.helpfulLinks.map((link, i) => (
-                            <a key={i} href={link.url} target="_blank" className={`flex items-center gap-3 p-4 rounded-xl border ${activeTheme.border} hover:${activeTheme.light} transition-colors group`}>
-                                <Icons.ExternalLink className={`w-5 h-5 ${activeTheme.accentText} opacity-70 group-hover:opacity-100`} />
-                                <span className="font-medium text-stone-800">{link.title}</span>
-                            </a>
-                        ))}
+                    <div className="p-6 space-y-6">
+                        
+                        {/* APP GUIDE SECTION */}
+                        <div>
+                            <h4 className="text-xs font-bold uppercase tracking-widest text-stone-400 mb-3">How to use this app</h4>
+                            <ul className="space-y-4 text-sm text-stone-600">
+                                <li className="flex gap-3 items-start">
+                                    <div className="mt-0.5"><Icons.ArrowRight className="w-4 h-4 text-stone-400" /></div>
+                                    <span><strong>Swipe the header</strong> left or right to easily switch between the Timeline and the Directory.</span>
+                                </li>
+                                <li className="flex gap-3 items-start">
+                                    <div className="mt-0.5"><Icons.Search className="w-4 h-4 text-stone-400" /></div>
+                                    <span><strong>Search & Filter</strong> to find specific events or view only what matters to you.</span>
+                                </li>
+                                <li className="flex gap-3 items-start">
+                                    <div className="mt-0.5"><Icons.ChevronDown className="w-4 h-4 text-stone-400" /></div>
+                                    <span><strong>Tap any event</strong> to expand it and see full details, checklists, and map links.</span>
+                                </li>
+                                <li className="flex gap-3 items-start">
+                                    <div className="mt-0.5"><Icons.Heart className="w-4 h-4 text-rose-400" fillClass="fill-rose-100" /></div>
+                                    <span><strong>Secret Checklists:</strong> Tap a filter role (like Bride or Groomsmen) 3 times fast to unlock your hidden packing list!</span>
+                                </li>
+                            </ul>
+                        </div>
+
+                        {/* EXTERNAL LINKS */}
+                        {CONFIG.helpfulLinks && CONFIG.helpfulLinks.length > 0 && (
+                            <div className="pt-2 border-t border-stone-100">
+                                <h4 className="text-xs font-bold uppercase tracking-widest text-stone-400 mb-3">Helpful Links</h4>
+                                <div className="space-y-2">
+                                    {CONFIG.helpfulLinks.map((link, i) => (
+                                        <a key={i} href={link.url} target="_blank" className={`flex items-center gap-3 p-4 rounded-xl border ${activeTheme.border} hover:${activeTheme.light} transition-colors group`}>
+                                            <Icons.ExternalLink className={`w-5 h-5 ${activeTheme.accentText} opacity-70 group-hover:opacity-100`} />
+                                            <span className="font-medium text-stone-800">{link.title}</span>
+                                        </a>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
@@ -285,10 +317,14 @@
 
         const ChecklistModal = ({ data, onClose }) => {
             const theme = MODAL_THEMES[data.theme] || MODAL_THEMES.ivory;
-            const isWeddingDayToday = true; // Use real date in production: new Date().toDateString() === new Date(CONFIG.weddingDate).toDateString();
-            const hasMessage = data.messageLines && data.messageLines.length > 0;
             
-            const [showMessage, setShowMessage] = useState(hasMessage && isWeddingDayToday);
+            // Logic to determine if message should be shown (Must be Wedding Day, but testable via toggle)
+            const isWeddingDayToday = new Date().toDateString() === new Date(CONFIG.weddingDate).toDateString();
+            const hasMessage = data.messageLines && data.messageLines.length > 0;
+            const canShowSecretFeature = hasMessage && isWeddingDayToday;
+            
+            const [showMessage, setShowMessage] = useState(false);
+            
             const initialItems = data.items ? data.items.map((item, idx) => ({ id: idx, text: item, checked: false })) : [];
             const [items, setItems] = useState(initialItems);
             
@@ -307,8 +343,8 @@
                             </div>
                         </div>
 
-                        {/* Hidden Message that expands */}
-                        {hasMessage && showMessage && (
+                        {/* Hidden Message that expands ABOVE checklist */}
+                        {canShowSecretFeature && showMessage && (
                             <div className={`mb-8 p-6 ${theme.checkBg} rounded-xl border ${theme.border} text-center animate-in fade-in slide-in-from-top-4`}>
                                 <Icons.Heart className={`w-8 h-8 mx-auto mb-4 ${theme.iconColor}`} />
                                 <div className={`space-y-4 font-light text-lg leading-relaxed ${theme.text}`}>
@@ -339,9 +375,10 @@
 
                         <div className="mt-8 text-center pb-8 flex flex-col items-center">
                             {data.footer && <p className={`${theme.signoff} text-xs font-mono uppercase tracking-[0.2em] mb-6`}>{data.footer}</p>}
-                            {hasMessage && (
-                                <button onClick={() => setShowMessage(!showMessage)} className="p-2 outline-none">
-                                    <Icons.Heart className={`w-5 h-5 ${theme.iconColor} opacity-50 hover:opacity-100 transition-opacity cursor-pointer`} />
+                            {/* The Secret Toggle Heart */}
+                            {canShowSecretFeature && (
+                                <button onClick={() => setShowMessage(!showMessage)} className="p-2 outline-none mt-2">
+                                    <Icons.Heart className={`w-6 h-6 ${theme.iconColor} opacity-40 hover:opacity-100 transition-opacity cursor-pointer`} />
                                 </button>
                             )}
                         </div>
@@ -364,7 +401,7 @@
             const [filterClicks, setFilterClicks] = useState({}); 
             
             const [view, setView] = useState('timeline'); 
-            const [directoryTab, setDirectoryTab] = useState('responsible');
+            const [directoryTab, setDirectoryTab] = useState('vendors');
             const [mapZoom, setMapZoom] = useState(false);
             const [isScrolled, setIsScrolled] = useState(false);
 
@@ -374,12 +411,10 @@
 
             useEffect(() => { const timer = setInterval(() => setCurrentTime(new Date()), 60000); return () => clearInterval(timer); }, []);
 
-            // Fix for Sticky Scrolling (Listens to the container, not the window)
+            // Fix for Sticky Scrolling 
             useEffect(() => {
                 const el = timelineScrollRef.current;
-                const handleScroll = () => {
-                    if (el) setIsScrolled(el.scrollTop > 80);
-                };
+                const handleScroll = () => { if (el) setIsScrolled(el.scrollTop > 80); };
                 if (el) el.addEventListener('scroll', handleScroll);
                 return () => { if (el) el.removeEventListener('scroll', handleScroll); }
             }, [view]);
@@ -631,10 +666,10 @@
                                 </div>
                             </div>
 
-                            {/* Timeline List */}
-                            <div className="max-w-3xl mx-auto w-full px-4 py-8 pb-32 flex-1">
-                                <div className="relative">
-                                    <div className="absolute left-[3.25rem] top-0 bottom-0 w-px bg-stone-300"></div>
+                            {/* SCROLLABLE TIMELINE LIST */}
+                            <div className="flex-1 overflow-y-auto w-full relative">
+                                <div className="max-w-3xl mx-auto w-full px-4 py-8 pb-32 relative">
+                                    <div className="absolute left-[3.25rem] top-8 bottom-32 w-px bg-stone-300"></div>
                                     <div className="space-y-4">
                                         {filteredEvents.map((event, index) => {
                                             const isExpanded = expandAll || expandedEvents.includes(event.id);
@@ -644,12 +679,16 @@
                                             const isFirstActive = event.id === currentEventId;
 
                                             return (
-                                                <div key={event.id} ref={isFirstActive ? activeRef : null} className={`relative transition-all duration-500 ease-in-out ${isExpanded ? 'flex flex-col items-center z-20 py-2' : 'pl-28'} ${isPast ? 'opacity-60 grayscale' : ''}`}>
-                                                    <div className={`transition-all duration-500 ease-in-out z-10 ${isExpanded ? 'relative mb-3' : 'absolute left-0 w-24 flex justify-center mt-1'}`}>
-                                                        <div className={`px-3 py-1.5 rounded-lg shadow-sm text-sm font-medium tracking-wide transition-all duration-500 ${isPast ? 'bg-stone-200 text-stone-500' : isNow && !isExpanded ? 'bg-black text-white shadow-md' : activeTheme.accent}`}>
+                                                <div key={event.id} ref={isFirstActive ? activeRef : null} className={`relative transition-all duration-500 ease-in-out ${isExpanded ? 'py-2 z-20 px-0' : 'pl-28'} ${isPast ? 'opacity-60 grayscale' : ''}`}>
+                                                    
+                                                    {/* The Time Badge */}
+                                                    <div className={`transition-all duration-500 ease-in-out z-10 flex ${isExpanded ? 'w-full justify-center mb-3 relative' : 'absolute left-0 w-24 justify-center mt-1'}`}>
+                                                        <div className={`px-3 py-1.5 rounded-lg shadow-sm text-sm font-medium tracking-wide transition-all duration-500 ${isPast ? 'bg-stone-200 text-stone-500' : isNow && !isExpanded ? 'bg-black text-white shadow-md scale-105' : activeTheme.accent}`}>
                                                             {event.time}
                                                         </div>
                                                     </div>
+                                                    
+                                                    {/* The Event Card */}
                                                     <div className={`bg-white rounded-xl border overflow-hidden transition-all duration-500 ease-in-out w-full ${isExpanded ? 'shadow-xl relative z-20 border-stone-300' : 'shadow-sm hover:shadow-md border-stone-200'} ${isNow && !isExpanded ? 'shadow-md' : ''}`}>
                                                         <button onClick={() => toggleEvent(event.id)} className="w-full px-6 py-5 text-left flex items-center justify-between bg-white outline-none">
                                                             <div className="flex-1 pr-4">
@@ -677,7 +716,7 @@
                                                                 {event.links && event.links.length > 0 && (
                                                                     <div className="mt-4 space-y-2">
                                                                         {event.links.map((link, idx) => (
-                                                                            <a key={idx} href={link.url} target="_blank" rel="noopener noreferrer" className={`inline-flex items-center gap-2 text-black text-sm underline-offset-4 hover:underline transition-colors`}><Icons.ExternalLink className="w-4 h-4" />{link.text}</a>
+                                                                            <a key={idx} href={link.url} target="_blank" rel="noopener noreferrer" className={`inline-flex items-center gap-2 ${activeTheme.accentText} text-sm underline-offset-4 hover:underline transition-colors`}><Icons.ExternalLink className="w-4 h-4" />{link.text}</a>
                                                                         ))}
                                                                     </div>
                                                                 )}
@@ -689,20 +728,19 @@
                                         })}
                                     </div>
                                 </div>
+                                <footer className="mt-8 border-t border-stone-200 w-full max-w-4xl mx-auto">
+                                    <div className="px-4 py-12 text-center">
+                                        <Icons.Heart className={`w-6 h-6 mx-auto mb-4 text-stone-300`} fillClass="fill-stone-100" />
+                                        <p className="text-stone-600 font-light text-sm">{CONFIG.footerMessage}</p>
+                                        <p className="text-stone-400 font-serif italic text-sm mt-4">{CONFIG.footerSignoff}</p>
+                                    </div>
+                                </footer>
                             </div>
-
-                            <footer className="mt-auto border-t border-stone-200">
-                                <div className="max-w-4xl mx-auto px-4 py-12 text-center">
-                                    <Icons.Heart className={`w-6 h-6 mx-auto mb-4 text-stone-300`} fillClass="fill-stone-100" />
-                                    <p className="text-stone-600 font-light text-sm">{CONFIG.footerMessage}</p>
-                                    <p className="text-stone-400 font-serif italic text-sm mt-4">{CONFIG.footerSignoff}</p>
-                                </div>
-                            </footer>
                         </div>
 
                         {/* --- VIEW 3: DIRECTORY (RIGHT) --- */}
                         <div className={`${panelWidth} shrink-0 h-screen overflow-y-auto relative bg-stone-50 flex flex-col`}>
-                            <div className="bg-white/95 backdrop-blur border-b border-stone-200 sticky top-0 z-50" onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd}>
+                            <div className="bg-white/95 backdrop-blur border-b border-stone-200 sticky top-0 z-50 shrink-0" onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd}>
                                 <div className="w-full flex justify-center pt-3 md:hidden"><div className="w-12 h-1.5 bg-stone-200 rounded-full"></div></div>
                                 <div className="max-w-3xl mx-auto px-6 py-6 pt-4 text-center select-none relative">
                                     <button onClick={() => setView('timeline')} className="absolute left-6 top-5 p-2 text-stone-400 hover:text-black md:hidden">
@@ -711,54 +749,56 @@
                                     <h2 className="text-3xl font-serif text-black mb-1">Directory</h2>
                                     <p className="text-stone-500 text-sm font-light">Key contacts for the big day.</p>
                                 </div>
-                                <div className="max-w-3xl mx-auto flex justify-center pb-4 space-x-2">
-                                    <button onClick={() => setDirectoryTab('responsible')} className={`px-4 py-2 font-serif text-sm transition-colors ${directoryTab === 'responsible' ? 'border-b-2 border-black text-black' : 'text-stone-400 hover:text-stone-600'}`}>Responsible People</button>
-                                    <button onClick={() => setDirectoryTab('vendors')} className={`px-4 py-2 font-serif text-sm transition-colors ${directoryTab === 'vendors' ? 'border-b-2 border-black text-black' : 'text-stone-400 hover:text-stone-600'}`}>Vendors</button>
+                                <div className="max-w-3xl mx-auto flex justify-center pb-0 space-x-2">
+                                    <button onClick={() => setDirectoryTab('vendors')} className={`px-4 py-3 font-serif text-sm transition-colors ${directoryTab === 'vendors' ? 'border-b-2 border-black text-black' : 'text-stone-400 hover:text-stone-600'}`}>Vendors</button>
+                                    <button onClick={() => setDirectoryTab('responsible')} className={`px-4 py-3 font-serif text-sm transition-colors ${directoryTab === 'responsible' ? 'border-b-2 border-black text-black' : 'text-stone-400 hover:text-stone-600'}`}>Responsible People</button>
                                 </div>
                             </div>
 
-                            <div className="max-w-3xl mx-auto w-full px-4 py-8 flex-1">
-                                {directoryTab === 'responsible' && (
-                                    <div className="bg-white rounded-2xl shadow-sm border border-stone-200 overflow-hidden animate-in fade-in zoom-in-95 duration-300">
-                                        <div className="divide-y divide-stone-100">
-                                            {responsiblePeople.map((person, idx) => (
-                                                <div key={idx} className="p-5 flex items-center justify-between hover:bg-stone-50 transition-colors">
-                                                    <div>
-                                                        <p className="text-xs font-bold uppercase tracking-widest text-stone-400 mb-1">{person.role}</p>
-                                                        <h3 className="text-base font-medium text-black">{person.name}</h3>
+                            <div className="flex-1 overflow-y-auto w-full">
+                                <div className="max-w-3xl mx-auto w-full px-4 py-8">
+                                    {directoryTab === 'responsible' && (
+                                        <div className="bg-white rounded-2xl shadow-sm border border-stone-200 overflow-hidden animate-in fade-in zoom-in-95 duration-300">
+                                            <div className="divide-y divide-stone-100">
+                                                {responsiblePeople.map((person, idx) => (
+                                                    <div key={idx} className="p-5 flex items-center justify-between hover:bg-stone-50 transition-colors">
+                                                        <div>
+                                                            <p className="text-xs font-bold uppercase tracking-widest text-stone-400 mb-1">{person.role}</p>
+                                                            <h3 className="text-base font-medium text-black">{person.name}</h3>
+                                                        </div>
+                                                        <a href={`tel:${person.contact}`} className={`flex items-center justify-center gap-2 bg-stone-800 text-white w-10 h-10 rounded-full hover:bg-black transition-colors`}><Icons.Phone className="w-4 h-4" /></a>
                                                     </div>
-                                                    <a href={`tel:${person.contact}`} className={`flex items-center justify-center gap-2 bg-stone-800 text-white w-10 h-10 rounded-full hover:bg-black transition-colors`}><Icons.Phone className="w-4 h-4" /></a>
-                                                </div>
-                                            ))}
+                                                ))}
+                                            </div>
                                         </div>
-                                    </div>
-                                )}
+                                    )}
 
-                                {directoryTab === 'vendors' && (
-                                    <div className="bg-white rounded-2xl shadow-sm border border-stone-200 overflow-hidden animate-in fade-in zoom-in-95 duration-300">
-                                        <div className="divide-y divide-stone-100">
-                                            {vendors.map((vendor, idx) => (
-                                                <div key={idx} className="p-5 flex flex-col sm:flex-row gap-4 sm:items-center justify-between hover:bg-stone-50 transition-colors">
-                                                    <div>
-                                                        <p className="text-xs font-bold uppercase tracking-widest text-stone-400 mb-1">{vendor.role}</p>
-                                                        <h3 className="text-base font-medium text-black">{vendor.name}</h3>
+                                    {directoryTab === 'vendors' && (
+                                        <div className="bg-white rounded-2xl shadow-sm border border-stone-200 overflow-hidden animate-in fade-in zoom-in-95 duration-300">
+                                            <div className="divide-y divide-stone-100">
+                                                {vendors.map((vendor, idx) => (
+                                                    <div key={idx} className="p-5 flex flex-col sm:flex-row gap-4 sm:items-center justify-between hover:bg-stone-50 transition-colors">
+                                                        <div>
+                                                            <p className="text-xs font-bold uppercase tracking-widest text-stone-400 mb-1">{vendor.role}</p>
+                                                            <h3 className="text-base font-medium text-black">{vendor.name}</h3>
+                                                        </div>
+                                                        <div className="flex gap-2">
+                                                            {vendor.email && (
+                                                                <a href={`mailto:${vendor.email}`} className={`flex items-center justify-center gap-2 border border-stone-200 text-stone-600 w-10 h-10 rounded-full hover:bg-stone-100 transition-colors`}><Icons.Mail className="w-4 h-4" /></a>
+                                                            )}
+                                                            {vendor.contact && vendor.contact !== 'TBA' ? (
+                                                                <a href={`tel:${vendor.contact}`} className={`flex items-center gap-2 bg-stone-800 text-white px-4 h-10 rounded-full text-sm font-medium hover:bg-black transition-colors`}><Icons.Phone className="w-4 h-4" /><span>Call</span></a>
+                                                            ) : (
+                                                                <span className="text-xs text-stone-400 font-mono bg-stone-100 px-3 h-10 rounded-full flex items-center">TBA</span>
+                                                            )}
+                                                        </div>
                                                     </div>
-                                                    <div className="flex gap-2">
-                                                        {vendor.email && (
-                                                            <a href={`mailto:${vendor.email}`} className={`flex items-center justify-center gap-2 border border-stone-200 text-stone-600 w-10 h-10 rounded-full hover:bg-stone-100 transition-colors`}><Icons.Mail className="w-4 h-4" /></a>
-                                                        )}
-                                                        {vendor.contact && vendor.contact !== 'TBA' ? (
-                                                            <a href={`tel:${vendor.contact}`} className={`flex items-center gap-2 bg-stone-800 text-white px-4 h-10 rounded-full text-sm font-medium hover:bg-black transition-colors`}><Icons.Phone className="w-4 h-4" /><span>Call</span></a>
-                                                        ) : (
-                                                            <span className="text-xs text-stone-400 font-mono bg-stone-100 px-3 h-10 rounded-full flex items-center">TBA</span>
-                                                        )}
-                                                    </div>
-                                                </div>
-                                            ))}
+                                                ))}
+                                            </div>
                                         </div>
-                                    </div>
-                                )}
-                                <div className="mt-12 text-center pb-12"><button onClick={() => setView('timeline')} className="text-stone-500 hover:text-black text-sm flex items-center justify-center gap-2 mx-auto transition-colors"><Icons.ArrowLeft className="w-4 h-4" />Back to Timeline</button></div>
+                                    )}
+                                    <div className="mt-12 text-center pb-12"><button onClick={() => setView('timeline')} className="text-stone-500 hover:text-black text-sm flex items-center justify-center gap-2 mx-auto transition-colors"><Icons.ArrowLeft className="w-4 h-4" />Back to Timeline</button></div>
+                                </div>
                             </div>
                         </div>
 
@@ -789,13 +829,8 @@
         if ('serviceWorker' in navigator) {
             const swCode = `
                 const CACHE = 'wedding-v1';
-                self.addEventListener('install', e => {
-                    e.waitUntil(caches.open(CACHE).then(c => c.addAll([location.href])));
-                    self.skipWaiting();
-                });
-                self.addEventListener('fetch', e => {
-                    e.respondWith(caches.match(e.request).then(res => res || fetch(e.request)));
-                });
+                self.addEventListener('install', e => { e.waitUntil(caches.open(CACHE).then(c => c.addAll([location.href]))); self.skipWaiting(); });
+                self.addEventListener('fetch', e => { e.respondWith(caches.match(e.request).then(res => res || fetch(e.request))); });
             `;
             const blob = new Blob([swCode], { type: 'application/javascript' });
             navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(console.error);
