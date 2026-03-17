@@ -19,6 +19,7 @@
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
     
     <style>
         body { font-family: 'Inter', sans-serif; overflow-x: hidden; background-color: #fafaf9; margin: 0; padding: 0; }
@@ -34,17 +35,21 @@
         
         @keyframes shake { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-5px); } 40%, 80% { transform: translateX(5px); } }
         .animate-shake { animation: shake 0.4s ease-in-out; }
+        
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .fade-in-up { animation: fadeUp 0.4s ease-out forwards; }
     </style>
 </head>
 <body>
-    <div id="root"></div>
+    <div id="root" class="h-full w-full"></div>
 
     <script type="text/babel">
         const { useState, useEffect, useRef } = React;
 
         // ============================================================================
-        // 🛠️ MASTER CONFIGURATION
+        // 🟢 BEGIN TEMPLATE DATA ZONE 🟢
         // ============================================================================
+        
         const CONFIG = {
             coupleNames: "Bride & Groom",
             weddingDate: "2026-08-28T00:00:00", // YYYY-MM-DD
@@ -182,6 +187,9 @@
                 ], links: []
             }
         ];
+
+        // ============================================================================
+        // 🔴 END TEMPLATE DATA ZONE 🔴
         // ============================================================================
 
         const THEMES = {
@@ -192,12 +200,11 @@
         };
         const activeTheme = THEMES[CONFIG.theme] || THEMES.classic;
 
-        // Perfected Checklist legible styles
         const MODAL_THEMES = {
             ivory: { bg: 'bg-[#faf9f6]', text: 'text-stone-800', title: 'text-stone-900', btn: 'bg-white hover:bg-stone-100 text-stone-800 border border-stone-200', iconBg: 'bg-white shadow-sm', iconColor: 'text-rose-400 fill-rose-50', signoff: 'text-stone-500', border: 'border-stone-200', checkBg: 'bg-white', checkBorder: 'border-stone-300 group-hover:border-stone-400', checkFill: 'bg-stone-400 border-stone-400 text-white', checkedText: 'text-stone-400 line-through', progressBg: 'bg-stone-200', progressFill: 'bg-stone-800' },
             blush: { bg: 'bg-[#fffafa]', text: 'text-[#6b5a5a]', title: 'text-[#4a3a3a]', btn: 'bg-[#fcf5f5] hover:bg-[#f5ebeb] text-[#8a7a7a] border border-[#f5ebeb]', iconBg: 'bg-white', iconColor: 'text-[#e8d5d5] fill-[#fcf5f5]', signoff: 'text-[#c2afaf]', border: 'border-[#f5ebeb]', checkBg: 'bg-white/80', checkBorder: 'border-[#e8d5d5] group-hover:border-[#d9c1c1]', checkFill: 'bg-[#d9c1c1] border-[#d9c1c1] text-white', checkedText: 'text-[#d9c1c1] line-through', progressBg: 'bg-[#f5ebeb]', progressFill: 'bg-[#bca0a0]' },
             dark: { bg: 'bg-stone-950', text: 'text-stone-200', title: 'text-white', btn: 'bg-stone-800 hover:bg-stone-700 text-white', iconBg: 'bg-stone-900', iconColor: 'text-stone-600 fill-stone-800', signoff: 'text-stone-500', border: 'border-stone-800', checkBg: 'bg-stone-900/50', checkBorder: 'border-stone-600 group-hover:border-stone-400', checkFill: 'bg-stone-700 border-stone-700 text-stone-300', checkedText: 'text-stone-600 line-through', progressBg: 'bg-stone-900', progressFill: 'bg-stone-300' },
-            charcoal: { bg: 'bg-[#1c1c1e]', text: 'text-[#d4d4d8]', title: 'text-white', btn: 'bg-[#27272a] hover:bg-[#3f3f46] text-white', iconBg: 'bg-[#27272a]', iconColor: 'text-[#52525b] fill-[#18181b]', signoff: 'text-[#71717a]', border: 'border-[#27272a]', checkBg: 'bg-[#27272a]/50', checkBorder: 'border-[#52525b] group-hover:border-[#71717a]', checkFill: 'bg-[#52525b] border-[#52525b] text-[#a1a1aa]', checkedText: 'text-[#52525b] line-through', progressBg: 'bg-[#27272a]', progressFill: 'bg-[#a1a1aa]' }
+            charcoal: { bg: 'bg-[#1c1c1e]', text: 'text-[#d4d4d8]', title: 'text-white', btn: 'bg-[#27272a] hover:bg-[#3f3f46] text-white', iconBg: 'bg-[#27272a]', iconColor: 'text-[#52525b] fill-[#18181b]', signoff: 'text-[#71717a]', border: 'border-[#27272a]', checkBg: 'bg-[#27272a]/50', checkBorder: 'border-[#52525b] group-hover:border-[#71717a]', checkFill: 'bg-[#3f3f46] border-[#3f3f46] text-[#a1a1aa]', checkedText: 'text-[#52525b] line-through', progressBg: 'bg-[#27272a]', progressFill: 'bg-[#a1a1aa]' }
         };
 
         const Icons = {
@@ -216,9 +223,6 @@
             ArrowUp: ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m18 15-6-6-6 6"/><path d="M12 9v15"/></svg>,
             Phone: ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>,
             Mail: ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>,
-            ZoomIn: ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="11" cy="11" r="8"/><line x1="21" x2="16.65" y1="21" y2="16.65"/><line x1="11" x2="11" y1="8" y2="14"/><line x1="8" x2="14" y1="11" y2="11"/></svg>,
-            ZoomOut: ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="11" cy="11" r="8"/><line x1="21" x2="16.65" y1="21" y2="16.65"/><line x1="8" x2="14" y1="11" y2="11"/></svg>,
-            Info: ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>,
             Lock: ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
         };
 
@@ -272,7 +276,6 @@
                         <button onClick={onClose} className="p-1 rounded-full hover:bg-black/10 transition"><Icons.X className="w-5 h-5 text-stone-600" /></button>
                     </div>
                     <div className="p-6 space-y-6">
-                        
                         <div>
                             <h4 className="text-xs font-bold uppercase tracking-widest text-stone-400 mb-3">How to use this app</h4>
                             <ul className="space-y-4 text-sm text-stone-600">
@@ -294,7 +297,6 @@
                                 </li>
                             </ul>
                         </div>
-
                         {CONFIG.helpfulLinks && CONFIG.helpfulLinks.length > 0 && (
                             <div className="pt-2 border-t border-stone-100">
                                 <h4 className="text-xs font-bold uppercase tracking-widest text-stone-400 mb-3">Helpful Links</h4>
@@ -316,7 +318,6 @@
         const ChecklistModal = ({ data, onClose }) => {
             const theme = MODAL_THEMES[data.theme] || MODAL_THEMES.ivory;
             
-            // Note: To easily test the message showing automatically, you can change this to `true`
             const isWeddingDayToday = new Date().toDateString() === new Date(CONFIG.weddingDate).toDateString();
             const hasMessage = data.messageLines && data.messageLines.length > 0;
             
@@ -402,25 +403,13 @@
             const [view, setView] = useState('timeline'); 
             const [directoryTab, setDirectoryTab] = useState('vendors');
             const [mapZoom, setMapZoom] = useState(false);
-            const [isScrolled, setIsScrolled] = useState(false);
-
-            const timelineScrollRef = useRef(null); 
-            const activeRef = useRef(null); 
-            const weddingDate = new Date(CONFIG.weddingDate);
-
-            // Native Smooth Scroll Tracking
-            const handleTimelineScroll = (e) => {
-                const scrollTop = e.currentTarget.scrollTop;
-                if (scrollTop > 100 && !isScrolled) setIsScrolled(true);
-                else if (scrollTop <= 100 && isScrolled) setIsScrolled(false);
-            };
 
             useEffect(() => { const timer = setInterval(() => setCurrentTime(new Date()), 60000); return () => clearInterval(timer); }, []);
 
             useEffect(() => {
                 const updateCountdown = () => {
                     const now = new Date();
-                    const difference = weddingDate.getTime() - now.getTime();
+                    const difference = new Date(CONFIG.weddingDate).getTime() - now.getTime();
                     if (difference > 0) {
                         setCountdown({ days: Math.floor(difference / (1000 * 60 * 60 * 24)), hours: Math.floor((difference / (1000 * 60 * 60)) % 24), minutes: Math.floor((difference / 1000 / 60) % 60), seconds: Math.floor((difference / 1000) % 60) });
                     } else { setCountdown({ days: 0, hours: 0, minutes: 0, seconds: 0 }); }
@@ -449,10 +438,6 @@
                 }
             };
 
-            const scrollToTop = () => {
-                if (timelineScrollRef.current) timelineScrollRef.current.scrollTo({ top: 0, behavior: 'smooth' });
-            };
-
             const parseEventTime = (timeStr) => {
                 const [time, period] = timeStr.split(' ');
                 let [hours, minutes] = time.split(':').map(Number);
@@ -461,7 +446,7 @@
                 return hours * 60 + minutes; 
             };
 
-            const isWeddingDay = true; // Force true to demonstrate functionality
+            const isWeddingDay = true; // Force true for testing
             const currentMinutes = currentTime.getHours() * 60 + currentTime.getMinutes();
 
             const getEventStatus = (eventTimeStr, nextEventTimeStr) => {
@@ -503,26 +488,6 @@
                 const searchMatch = searchQuery === '' || searchTextMatches(event.title) || descMatch || searchTextMatches(event.location) || searchTextMatches(event.time) || (event.responsible && event.responsible.some(r => searchTextMatches(r)));
                 return teamMatch && searchMatch;
             });
-
-            let currentEventId = null;
-            if (isWeddingDay) {
-                for (let i = 0; i < filteredEvents.length; i++) {
-                    if (getEventStatus(filteredEvents[i].time, filteredEvents[i+1]?.time) === 'now') { currentEventId = filteredEvents[i].id; break; }
-                }
-                if (!currentEventId) {
-                    const next = filteredEvents.find(e => parseEventTime(e.time) > currentMinutes);
-                    if (next) currentEventId = next.id;
-                }
-            }
-            if (!isWeddingDay && filteredEvents.length > 0) currentEventId = filteredEvents[0].id;
-
-            useEffect(() => {
-                if (timelineScrollRef.current) timelineScrollRef.current.scrollTo({ top: 0, left: 0, behavior: 'instant' });
-                setIsScrolled(false);
-                if (activeRef.current && view === 'timeline') {
-                    setTimeout(() => activeRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' }), 500); 
-                }
-            }, [view]);
 
             const toggleFilter = (filterId) => {
                 let clicks = 1;
@@ -586,7 +551,6 @@
 
                     <div className={`flex ${layoutWidth} transition-transform duration-500 ease-in-out h-screen md:h-[100dvh]`} style={{ transform: `translateX(-${translation}%)` }}>
                         
-                        {/* --- VIEW 1: MAP --- */}
                         {CONFIG.enableMapScreen && (
                             <div className={`${panelWidth} shrink-0 h-screen md:h-[100dvh] relative bg-stone-200 flex flex-col`}>
                                 <div className="absolute top-6 left-6 z-10"><button onClick={() => setView('timeline')} className="bg-white/90 p-3 rounded-full shadow-md"><Icons.ArrowRight className="w-6 h-6 text-stone-600" /></button></div>
@@ -599,10 +563,9 @@
                             </div>
                         )}
 
-                        {/* --- VIEW 2: TIMELINE --- */}
-                        <div ref={timelineScrollRef} onScroll={handleTimelineScroll} className={`${panelWidth} shrink-0 relative z-20 h-screen md:h-[100dvh] overflow-y-auto bg-stone-50`}>
+                        <div className={`${panelWidth} shrink-0 relative z-20 h-screen md:h-[100dvh] overflow-y-auto bg-stone-50 flex flex-col`}>
                             
-                            {/* NATIVE SCROLL-AWAY HEADER */}
+                            {/* TRUE SCROLL-AWAY HEADER - No JS Glitching */}
                             <header className="max-w-4xl mx-auto px-4 py-8 text-center select-none flex flex-col items-center justify-center" onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd}>
                                 <div className="w-full flex justify-center pb-6 md:hidden"><div className="w-12 h-1.5 bg-stone-200 rounded-full"></div></div>
                                 <h1 className="text-4xl font-serif text-black mb-2">{CONFIG.coupleNames}</h1>
@@ -624,15 +587,12 @@
                                 )}
                             </header>
 
-                            {/* TRUE STICKY FILTER BAR */}
+                            {/* STICKY FILTER BAR */}
                             <div className="sticky top-0 z-50 w-full bg-white/95 backdrop-blur shadow-sm border-b border-stone-200 transition-all duration-300" onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd}>
                                 <div className="max-w-4xl mx-auto px-4 w-full">
                                     <div className="flex items-center justify-between w-full py-4">
-                                        <button onClick={scrollToTop} className={`pr-4 pl-2 text-stone-400 hover:text-black transition-opacity duration-300 md:hidden ${isScrolled ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
-                                            <Icons.ArrowUp className="w-5 h-5" />
-                                        </button>
-
-                                        <button onClick={() => { if(isScrolled) scrollToTop(); setShowFilters(!showFilters); }} className="flex-1 flex items-center justify-center gap-2 text-stone-600 hover:text-black transition-colors">
+                                        
+                                        <button onClick={() => setShowFilters(!showFilters)} className="flex-1 flex items-center justify-center gap-2 text-stone-600 hover:text-black transition-colors">
                                             <Icons.Search className="w-4 h-4" /><span className="font-serif text-sm uppercase tracking-wider">Search & Filters</span>
                                             {showFilters ? <Icons.ChevronUp className="w-4 h-4" /> : <Icons.ChevronDown className="w-4 h-4" />}
                                         </button>
@@ -663,7 +623,7 @@
                             </div>
 
                             {/* TIMELINE LIST */}
-                            <div className="w-full relative pb-32">
+                            <div className="flex-1 w-full relative pb-32">
                                 <div className="max-w-3xl mx-auto w-full px-4 pt-4 relative">
                                     <div className="absolute left-[3.25rem] top-4 bottom-0 w-px bg-stone-300 z-0"></div>
                                     
@@ -673,10 +633,9 @@
                                             const status = getEventStatus(event.time, filteredEvents[index+1]?.time);
                                             const isPast = status === 'past';
                                             const isNow = status === 'now';
-                                            const isFirstActive = event.id === currentEventId;
 
                                             return (
-                                                <div key={event.id} ref={isFirstActive ? activeRef : null} className={`relative z-10 transition-all duration-300 ease-in-out ${isPast ? 'opacity-60 grayscale' : ''}`}>
+                                                <div key={event.id} className={`relative z-10 transition-all duration-300 ease-in-out ${isPast ? 'opacity-60 grayscale' : ''}`}>
                                                     
                                                     {isExpanded ? (
                                                         <div className="flex flex-col w-full py-2 fade-in-up">
@@ -752,7 +711,7 @@
 
                         {/* --- VIEW 3: DIRECTORY (RIGHT) --- */}
                         <div className={`${panelWidth} shrink-0 h-screen md:h-[100dvh] overflow-y-auto relative bg-stone-50 flex flex-col`}>
-                            <div className="bg-white/95 backdrop-blur border-b border-stone-200 sticky top-0 z-50 shrink-0" onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd}>
+                            <div className="flex-none bg-white/95 backdrop-blur border-b border-stone-200 z-50 transition-all duration-300" onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd}>
                                 <div className="w-full flex justify-center pt-3 md:hidden"><div className="w-12 h-1.5 bg-stone-200 rounded-full"></div></div>
                                 <div className="max-w-3xl mx-auto px-6 py-6 pt-4 text-center select-none relative">
                                     <button onClick={() => setView('timeline')} className="absolute left-6 top-5 p-2 text-stone-400 hover:text-black md:hidden">
@@ -767,7 +726,7 @@
                                 </div>
                             </div>
 
-                            <div className="flex-1 overflow-y-auto w-full">
+                            <div className="flex-1 overflow-y-auto w-full pb-20">
                                 <div className="max-w-3xl mx-auto w-full px-4 py-8">
                                     {directoryTab === 'responsible' && (
                                         <div className="bg-white rounded-2xl shadow-sm border border-stone-200 overflow-hidden animate-in fade-in zoom-in-95 duration-300">
@@ -829,7 +788,7 @@
             }, []);
 
             if (!isAuthenticated) return <PinScreen onAccess={() => setIsAuthenticated(true)} />;
-            return <div className="animate-in fade-in zoom-in-95 duration-500 ease-out"><WeddingTimeline /></div>;
+            return <WeddingTimeline />;
         };
 
         const root = ReactDOM.createRoot(document.getElementById('root'));
