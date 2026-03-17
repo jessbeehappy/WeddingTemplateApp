@@ -19,7 +19,6 @@
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
     
     <style>
         /* Lock body scrolling, allow inner React app to scroll */
@@ -198,11 +197,12 @@
         };
         const activeTheme = THEMES[CONFIG.theme] || THEMES.classic;
 
+        // Using opacity-40 line-through for perfect greyed-out checklist completion
         const MODAL_THEMES = {
-            ivory: { bg: 'bg-[#faf9f6]', text: 'text-stone-800', title: 'text-stone-900', btn: 'bg-white hover:bg-stone-100 text-stone-800 border border-stone-200', iconBg: 'bg-white shadow-sm', iconColor: 'text-rose-400 fill-rose-50', signoff: 'text-stone-500', border: 'border-stone-200', checkBg: 'bg-white', checkBorder: 'border-stone-300 group-hover:border-stone-400', checkFill: 'bg-stone-400 border-stone-400 text-white', checkedText: 'text-stone-400 line-through', progressBg: 'bg-stone-200', progressFill: 'bg-stone-800' },
-            blush: { bg: 'bg-[#fffafa]', text: 'text-[#6b5a5a]', title: 'text-[#4a3a3a]', btn: 'bg-[#fcf5f5] hover:bg-[#f5ebeb] text-[#8a7a7a] border border-[#f5ebeb]', iconBg: 'bg-white', iconColor: 'text-[#e8d5d5] fill-[#fcf5f5]', signoff: 'text-[#c2afaf]', border: 'border-[#f5ebeb]', checkBg: 'bg-white/80', checkBorder: 'border-[#e8d5d5] group-hover:border-[#d9c1c1]', checkFill: 'bg-[#d9c1c1] border-[#d9c1c1] text-white', checkedText: 'text-[#d9c1c1] line-through', progressBg: 'bg-[#f5ebeb]', progressFill: 'bg-[#bca0a0]' },
-            dark: { bg: 'bg-stone-950', text: 'text-stone-200', title: 'text-white', btn: 'bg-stone-800 hover:bg-stone-700 text-white', iconBg: 'bg-stone-900', iconColor: 'text-stone-600 fill-stone-800', signoff: 'text-stone-500', border: 'border-stone-800', checkBg: 'bg-stone-900/50', checkBorder: 'border-stone-600 group-hover:border-stone-400', checkFill: 'bg-stone-700 border-stone-700 text-stone-300', checkedText: 'text-stone-600 line-through', progressBg: 'bg-stone-900', progressFill: 'bg-stone-300' },
-            charcoal: { bg: 'bg-[#1c1c1e]', text: 'text-[#d4d4d8]', title: 'text-white', btn: 'bg-[#27272a] hover:bg-[#3f3f46] text-white', iconBg: 'bg-[#27272a]', iconColor: 'text-[#52525b] fill-[#18181b]', signoff: 'text-[#71717a]', border: 'border-[#27272a]', checkBg: 'bg-[#27272a]/50', checkBorder: 'border-[#52525b] group-hover:border-[#71717a]', checkFill: 'bg-[#52525b] border-[#52525b] text-[#a1a1aa]', checkedText: 'text-[#52525b] line-through', progressBg: 'bg-[#27272a]', progressFill: 'bg-[#a1a1aa]' }
+            ivory: { bg: 'bg-[#faf9f6]', text: 'text-stone-800', title: 'text-stone-900', btn: 'bg-white hover:bg-stone-100 text-stone-800 border border-stone-200', iconBg: 'bg-white shadow-sm', iconColor: 'text-rose-400 fill-rose-50', signoff: 'text-stone-500', border: 'border-stone-200', checkBg: 'bg-white', checkBorder: 'border-stone-300 group-hover:border-stone-400', checkFill: 'bg-stone-400 border-stone-400 text-white', checkedText: 'opacity-40 line-through', progressBg: 'bg-stone-200', progressFill: 'bg-stone-800' },
+            blush: { bg: 'bg-[#fffafa]', text: 'text-[#6b5a5a]', title: 'text-[#4a3a3a]', btn: 'bg-[#fcf5f5] hover:bg-[#f5ebeb] text-[#8a7a7a] border border-[#f5ebeb]', iconBg: 'bg-white', iconColor: 'text-[#e8d5d5] fill-[#fcf5f5]', signoff: 'text-[#c2afaf]', border: 'border-[#f5ebeb]', checkBg: 'bg-white/80', checkBorder: 'border-[#e8d5d5] group-hover:border-[#d9c1c1]', checkFill: 'bg-[#d9c1c1] border-[#d9c1c1] text-white', checkedText: 'opacity-40 line-through', progressBg: 'bg-[#f5ebeb]', progressFill: 'bg-[#bca0a0]' },
+            dark: { bg: 'bg-stone-950', text: 'text-stone-200', title: 'text-white', btn: 'bg-stone-800 hover:bg-stone-700 text-white', iconBg: 'bg-stone-900', iconColor: 'text-stone-600 fill-stone-800', signoff: 'text-stone-500', border: 'border-stone-800', checkBg: 'bg-stone-900/50', checkBorder: 'border-stone-600 group-hover:border-stone-400', checkFill: 'bg-stone-700 border-stone-700 text-stone-300', checkedText: 'opacity-40 line-through', progressBg: 'bg-stone-900', progressFill: 'bg-stone-300' },
+            charcoal: { bg: 'bg-[#1c1c1e]', text: 'text-[#d4d4d8]', title: 'text-white', btn: 'bg-[#27272a] hover:bg-[#3f3f46] text-white', iconBg: 'bg-[#27272a]', iconColor: 'text-[#52525b] fill-[#18181b]', signoff: 'text-[#71717a]', border: 'border-[#27272a]', checkBg: 'bg-[#27272a]/50', checkBorder: 'border-[#52525b] group-hover:border-[#71717a]', checkFill: 'bg-[#3f3f46] border-[#3f3f46] text-[#a1a1aa]', checkedText: 'opacity-40 line-through', progressBg: 'bg-[#27272a]', progressFill: 'bg-[#a1a1aa]' }
         };
 
         const Icons = {
@@ -274,6 +274,7 @@
                         <button onClick={onClose} className="p-1 rounded-full hover:bg-black/10 transition"><Icons.X className="w-5 h-5 text-stone-600" /></button>
                     </div>
                     <div className="p-6 space-y-6">
+                        
                         <div>
                             <h4 className="text-xs font-bold uppercase tracking-widest text-stone-400 mb-3">How to use this app</h4>
                             <ul className="space-y-4 text-sm text-stone-600">
@@ -295,6 +296,7 @@
                                 </li>
                             </ul>
                         </div>
+
                         {CONFIG.helpfulLinks && CONFIG.helpfulLinks.length > 0 && (
                             <div className="pt-2 border-t border-stone-100">
                                 <h4 className="text-xs font-bold uppercase tracking-widest text-stone-400 mb-3">Helpful Links</h4>
@@ -339,14 +341,17 @@
                             </div>
                         </div>
 
-                        {hasMessage && showMessage && (
-                            <div className={`mb-8 p-6 ${theme.checkBg} rounded-xl border ${theme.border} text-center animate-in fade-in slide-in-from-top-4`}>
-                                <Icons.Heart className={`w-8 h-8 mx-auto mb-4 ${theme.iconColor}`} />
-                                <div className={`space-y-4 font-light text-lg leading-relaxed ${theme.text}`}>
-                                    {data.messageLines.map((line, i) => (<p key={i} className={i === 0 ? `text-2xl font-serif italic ${theme.title}` : ""}>{line}</p>))}
+                        {/* Hidden Message that expands ABOVE checklist */}
+                        <div className={`overflow-hidden transition-all duration-500 ease-in-out ${showMessage ? 'max-h-[1000px] opacity-100 mb-8' : 'max-h-0 opacity-0 mb-0'}`}>
+                            {hasMessage && (
+                                <div className={`p-6 ${theme.checkBg} rounded-xl border ${theme.border} text-center animate-in fade-in slide-in-from-top-4`}>
+                                    <Icons.Heart className={`w-8 h-8 mx-auto mb-4 ${theme.iconColor}`} />
+                                    <div className={`space-y-4 font-light text-lg leading-relaxed ${theme.text}`}>
+                                        {data.messageLines.map((line, i) => (<p key={i} className={i === 0 ? `text-2xl font-serif italic ${theme.title}` : ""}>{line}</p>))}
+                                    </div>
                                 </div>
-                            </div>
-                        )}
+                            )}
+                        </div>
 
                         <div className={`sticky top-0 z-30 ${theme.bg} pb-6 pt-2 mb-2 border-b ${theme.border}`}>
                             <div className={`flex justify-between text-xs font-mono mb-2 uppercase tracking-wider ${theme.signoff}`}>
@@ -370,6 +375,7 @@
 
                         <div className="mt-8 text-center pb-8 flex flex-col items-center">
                             {data.footer && <p className={`${theme.signoff} text-xs font-mono uppercase tracking-[0.2em] mb-6`}>{data.footer}</p>}
+                            {/* The Secret Toggle Heart */}
                             {hasMessage && (
                                 <button onClick={() => setShowMessage(!showMessage)} className="p-2 outline-none mt-2">
                                     <Icons.Heart className={`w-6 h-6 ${theme.iconColor} ${showMessage ? 'opacity-100' : 'opacity-40'} hover:opacity-100 transition-opacity cursor-pointer`} />
@@ -395,7 +401,7 @@
             const [filterClicks, setFilterClicks] = useState({ id: null, count: 0 }); 
             
             const [view, setView] = useState('timeline'); 
-            const [directoryTab, setDirectoryTab] = useState('vendors'); // Defaults to Vendors
+            const [directoryTab, setDirectoryTab] = useState('vendors');
             const [mapZoom, setMapZoom] = useState(false);
             const [isScrolled, setIsScrolled] = useState(false);
 
@@ -403,7 +409,7 @@
             const activeRef = useRef(null); 
             const weddingDate = new Date(CONFIG.weddingDate);
 
-            // True Native Scroll Tracking 
+            // Native Smooth Scroll Tracking
             const handleTimelineScroll = (e) => {
                 const scrollTop = e.currentTarget.scrollTop;
                 if (scrollTop > 60 && !isScrolled) setIsScrolled(true);
@@ -457,7 +463,7 @@
                 return hours * 60 + minutes; 
             };
 
-            const isWeddingDay = true; // For testing
+            const isWeddingDay = true; // Force true for testing highlight
             const currentMinutes = currentTime.getHours() * 60 + currentTime.getMinutes();
 
             const getEventStatus = (eventTimeStr, nextEventTimeStr) => {
@@ -514,7 +520,6 @@
 
             useEffect(() => {
                 if (timelineScrollRef.current) timelineScrollRef.current.scrollTo({ top: 0, left: 0, behavior: 'instant' });
-                setIsScrolled(false);
                 if (activeRef.current && view === 'timeline') {
                     setTimeout(() => activeRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' }), 500); 
                 }
@@ -542,9 +547,7 @@
                         const isSelected = clean.includes(filterId);
 
                         if (isSelected) { 
-                            if (CONFIG.checklists[filterId] && clicks === 2) {
-                                return prev;
-                            }
+                            if (CONFIG.checklists[filterId] && clicks === 2) return prev; // Do not unselect on double tap
                             const updated = clean.filter(f => f !== filterId); 
                             return updated.length === 0 ? ['all'] : updated; 
                         } else { 
@@ -673,15 +676,17 @@
                                             const isFirstActive = event.id === currentEventId;
 
                                             return (
-                                                <div key={event.id} ref={isFirstActive ? activeRef : null} className={`relative transition-all duration-500 ease-in-out ${isExpanded ? 'py-4 z-20 pl-0' : 'pl-[5.5rem]'} ${isPast ? 'opacity-60 grayscale' : ''}`}>
+                                                <div key={event.id} ref={isFirstActive ? activeRef : null} className={`relative transition-all duration-300 ease-in-out ${isExpanded ? 'py-4 z-20 pl-0' : 'pl-[5.5rem]'} ${isPast ? 'opacity-60 grayscale' : ''}`}>
                                                     
-                                                    <div className={`transition-all duration-500 ease-in-out z-10 flex ${isExpanded ? 'w-full justify-center mb-4 relative' : 'absolute left-0 w-20 justify-center mt-1'}`}>
-                                                        <div className={`px-3 py-1.5 rounded-lg shadow-sm text-sm font-medium tracking-wide transition-all duration-500 ${isPast ? 'bg-stone-200 text-stone-500' : isNow && !isExpanded ? 'bg-black text-white shadow-md scale-105' : activeTheme.accent}`}>
+                                                    {/* Expanded Event: Centers Time above the Card */}
+                                                    <div className={`transition-all duration-300 ease-in-out z-10 flex ${isExpanded ? 'w-full justify-center mb-4 relative' : 'absolute left-0 w-20 justify-center mt-1'}`}>
+                                                        <div className={`px-3 py-1.5 rounded-lg shadow-sm text-sm font-medium tracking-wide transition-all duration-300 ${isPast ? 'bg-stone-200 text-stone-500' : isNow && !isExpanded ? 'bg-black text-white shadow-md scale-105' : activeTheme.accent}`}>
                                                             {event.time}
                                                         </div>
                                                     </div>
                                                     
-                                                    <div className={`bg-white rounded-xl border transition-all duration-500 ease-in-out w-full ${isExpanded ? 'shadow-xl border-stone-300 relative z-20' : 'shadow-sm hover:shadow-md border-stone-200'}`}>
+                                                    {/* The Event Card */}
+                                                    <div className={`bg-white rounded-xl border transition-all duration-300 ease-in-out w-full ${isExpanded ? 'shadow-xl border-stone-300 relative z-20' : 'shadow-sm hover:shadow-md border-stone-200'} ${isNow && !isExpanded ? 'shadow-md' : ''}`}>
                                                         <button onClick={() => toggleEvent(event.id)} className="w-full px-6 py-5 text-left flex items-center justify-between bg-white outline-none rounded-xl">
                                                             <div className="flex-1 pr-4">
                                                                 <h3 className="text-xl font-serif text-black mb-2">{event.title}</h3>
@@ -731,7 +736,7 @@
                         </div>
 
                         {/* --- VIEW 3: DIRECTORY (RIGHT) --- */}
-                        <div className={`${panelWidth} shrink-0 h-full relative bg-stone-50 flex flex-col`}>
+                        <div className={`${panelWidth} shrink-0 h-full overflow-y-auto relative bg-stone-50 flex flex-col`}>
                             <div className="flex-none bg-white/95 backdrop-blur border-b border-stone-200 z-50 transition-all duration-300" onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd}>
                                 <div className="w-full flex justify-center pt-3 md:hidden"><div className="w-12 h-1.5 bg-stone-200 rounded-full"></div></div>
                                 <div className="max-w-3xl mx-auto px-6 py-6 pt-4 text-center select-none relative">
@@ -747,7 +752,7 @@
                                 </div>
                             </div>
 
-                            <div className="flex-1 overflow-y-auto w-full">
+                            <div className="flex-1 overflow-y-auto w-full pb-20">
                                 <div className="max-w-3xl mx-auto w-full px-4 py-8">
                                     {directoryTab === 'responsible' && (
                                         <div className="bg-white rounded-2xl shadow-sm border border-stone-200 overflow-hidden animate-in fade-in zoom-in-95 duration-300">
